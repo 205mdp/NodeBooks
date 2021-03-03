@@ -4,6 +4,22 @@ const app = express();
 
 app.use(cors());
 
+var mysql = require("mysql");
+
+var conexion = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "root",
+  database: "biblioteca",
+});
+
+conexion.connect(function (err) {
+  if (err) {
+    console.log(err.code);
+    console.log(err.fatal);
+  }
+});
+
 app.get("/", function (req, res) {
   try {
     res.send("Holla Utn");
