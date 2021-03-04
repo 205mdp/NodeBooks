@@ -1,9 +1,8 @@
+"use strict";
 const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql");
 const util = require("util");
-const { count } = require("console");
-const { runInNewContext } = require("vm");
 
 const app = express();
 
@@ -37,11 +36,29 @@ app.get("/", function (req, res) {
 
 // Categoria
 // No se debe implementar el PUT
-app.post("/categoria", function (req, res) {
+app.post("/categoria", async (req, res) => {
   try {
+    const nombre = req.body.nombre; // Hacer verificacion de la categoria.
+
+    const respuesta = await query("INSERT INTO categoria (nombre) values (?)", [
+      nombre,
+    ]);
+    if (respuesta.insertId > 0) {
+      res
+        .status(200)
+        .send({ message: "Se inserto el id " + respuesta.insertId.toString() });
+    } else {
+      // TODO
+    }
+
+    // console.log(respuesta);
     // recibe: {nombre: string}
-    res.status(200).send("TODO Categoria post"); // {id: numerico, nombre: string}
+    // {id: numerico, nombre: string}
   } catch (error) {
+    // console.log(error);
+    if (error.code == "ER_DUP_ENTRY") {
+      res.status(413).send({ message: "Ese nombre de categoria ya existe" });
+    }
     // TODO puede ser: "faltan datos", "ese nombre de categoria ya existe", "error inesperado"
     res.status(413).send({ message: error.message });
   }
@@ -68,7 +85,8 @@ app.get("/categoria/:id", async (req, res) => {
       throw new Error("Error inesperado el id no es un numero");
     }
     const respuesta = await query(
-      "SELECT id, nombre FROM categoria WHERE id=" + [categoria_id]
+      "SELECT id, nombre FROM categoria WHERE id=?",
+      [categoria_id]
     );
     if (respuesta.length == 1) {
       res.status(200).send(respuesta[0]);
@@ -83,9 +101,20 @@ app.get("/categoria/:id", async (req, res) => {
   }
 });
 
-app.delete("/categoria/:id", function (req, res) {
+app.delete("/categoria/:id", async (req, res) => {
   try {
-    res.status(200).send("TODO Categoria id delete"); //    {mensaje: "se borro correctamente"}
+    // console.log("Catagoria por id" + req.params.id);
+    var categoria_id = req.params.id;
+    if (isNaN(categoria_id)) {
+      throw new Error("Error inesperado el id no es un numero");
+    }
+    const respuesta = await query("DELETE FROM categoria WHERE id=?", [
+      categoria_id,
+    ]);
+    if (respuesta.affectedRows == 1) {
+      res.status(200).send({ message: "se borro el registro " + categoria_id }); //    {mensaje: "se borro correctamente"}
+    }
+    //console.log(respuesta);
   } catch (error) {
     // er: "error inesperado", "categoria con libros asociados, no se puede eliminar", "no existe la categoria indicada"
     res.status(413).send({ message: error.message });
