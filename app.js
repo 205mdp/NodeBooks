@@ -1,15 +1,17 @@
 const express = require("express");
 const cors = require("cors");
+const mysql = require("mysql");
+const util = require("util");
+
 const app = express();
 
 app.use(cors());
-
-var mysql = require("mysql");
+app.use(express.urlencoded());
 
 var conexion = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "root",
+  password: "rootroot",
   database: "biblioteca",
 });
 
@@ -19,6 +21,7 @@ conexion.connect(function (err) {
     console.log(err.fatal);
   }
 });
+const query = util.promisify(conexion.query).bind(conexion);
 
 app.get("/", function (req, res) {
   try {
@@ -42,9 +45,14 @@ app.post("/categoria", function (req, res) {
   }
 });
 
-app.get("/categoria", function (req, res) {
+app.get("/categoria", async (req, res) => {
   try {
-    res.status(200).send("TODO Categoria"); //  [{id:numerico, nombre:string}]
+    console.log("Categoria");
+    const respuesta = await query("SELECT * FROM categoria");
+
+    res.status(200).send(respuesta);
+
+    // res.status(200).send("TODO Categoria"); //  [{id:numerico, nombre:string}]
   } catch (error) {
     res.status(413).send({ message: error.message });
   }
