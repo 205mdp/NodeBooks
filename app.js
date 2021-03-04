@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql");
 const util = require("util");
+const { count } = require("console");
+const { runInNewContext } = require("vm");
 
 const app = express();
 
@@ -47,7 +49,7 @@ app.post("/categoria", function (req, res) {
 
 app.get("/categoria", async (req, res) => {
   try {
-    console.log("Categoria");
+    // console.log("Categoria");
     const respuesta = await query("SELECT * FROM categoria");
 
     res.status(200).send(respuesta);
@@ -58,9 +60,23 @@ app.get("/categoria", async (req, res) => {
   }
 });
 
-app.get("/categoria/:id", function (req, res) {
+app.get("/categoria/:id", async (req, res) => {
   try {
-    res.status(200).send("TODO Categoria id"); //   {id: numerico, nombre:string}
+    // console.log("Catagoria por id" + req.params.id);
+    var categoria_id = req.params.id;
+    if (isNaN(categoria_id)) {
+      throw new Error("Error inesperado el id no es un numero");
+    }
+    const respuesta = await query(
+      "SELECT id, nombre FROM categoria WHERE id=" + [categoria_id]
+    );
+    if (respuesta.length == 1) {
+      res.status(200).send(respuesta[0]);
+    } else if (respuesta.length == 0) {
+      throw new Error("La categoria no fue encontrada");
+    }
+
+    //res.status(200).send(respuesta); //   {id: numerico, nombre:string}
   } catch (error) {
     // ser: "error inesperado", "categoria no encontrada"
     res.status(413).send({ message: error.message });
