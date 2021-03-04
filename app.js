@@ -13,7 +13,7 @@ app.use(express.urlencoded());
 var conexion = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "rootroot",
+  password: "rootoot",
   database: "biblioteca",
 });
 
@@ -27,7 +27,7 @@ const query = util.promisify(conexion.query).bind(conexion);
 
 app.get("/", function (req, res) {
   try {
-    res.send("Holla Utn");
+    res.send("Hola UTN");
   } catch (error) {
     res.status(413).send({ message: error.message });
   }
