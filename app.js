@@ -19,7 +19,7 @@ app.get("/", function (req, res) {
   }
 });
 
-// Login
+// Login /
 
 // Categoria
 // No se debe implementar el PUT
