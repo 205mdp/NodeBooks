@@ -5,7 +5,7 @@ const mysql = require("mysql");
 const util = require("util");
 
 const app = express();
-// Test juan
+// Test juan Perfecto llego
 app.use(cors());
 app.use(express.urlencoded());
 
