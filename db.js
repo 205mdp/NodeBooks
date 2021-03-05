@@ -5,6 +5,7 @@ var db;
 
 function connectDatabase() {
   if (!db) {
+    // test
     //console.log(settings.database);
     db = mysql.createConnection({
       host: "localhost",
