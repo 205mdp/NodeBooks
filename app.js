@@ -9,20 +9,7 @@ const app = express();
 app.use(cors());
 app.use(express.urlencoded());
 
-var conexion = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "rootroot",
-  database: "biblioteca",
-});
-
-conexion.connect(function (err) {
-  if (err) {
-    console.log(err.code);
-    console.log(err.fatal);
-  }
-});
-const query = util.promisify(conexion.query).bind(conexion);
+var conexion = require("./db");
 
 app.get("/", function (req, res) {
   try {
@@ -40,9 +27,10 @@ app.post("/categoria", async (req, res) => {
   try {
     const nombre = req.body.nombre; // Hacer verificacion de la categoria.
 
-    const respuesta = await query("INSERT INTO categoria (nombre) values (?)", [
-      nombre,
-    ]);
+    const respuesta = await conexion.query(
+      "INSERT INTO categoria (nombre) values (?)",
+      [nombre]
+    );
     if (respuesta.insertId > 0) {
       res
         .status(200)
@@ -67,7 +55,7 @@ app.post("/categoria", async (req, res) => {
 app.get("/categoria", async (req, res) => {
   try {
     // console.log("Categoria");
-    const respuesta = await query("SELECT * FROM categoria");
+    const respuesta = await conexion.query("SELECT * FROM categoria");
 
     res.status(200).send(respuesta);
 
@@ -84,7 +72,7 @@ app.get("/categoria/:id", async (req, res) => {
     if (isNaN(categoria_id)) {
       throw new Error("Error inesperado el id no es un numero");
     }
-    const respuesta = await query(
+    const respuesta = await conexion.query(
       "SELECT id, nombre FROM categoria WHERE id=?",
       [categoria_id]
     );
@@ -108,7 +96,7 @@ app.delete("/categoria/:id", async (req, res) => {
     if (isNaN(categoria_id)) {
       throw new Error("Error inesperado el id no es un numero");
     }
-    const respuesta = await query("DELETE FROM categoria WHERE id=?", [
+    const respuesta = await conexion.query("DELETE FROM categoria WHERE id=?", [
       categoria_id,
     ]);
     if (respuesta.affectedRows == 1) {
