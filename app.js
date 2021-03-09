@@ -109,23 +109,32 @@ app.delete("/categoria/:id", async (req, res) => {
 
 // Persona
 app.post("/persona", async (req, res) => {
-  try {    
+  try {
     //recibe: {nombre: string, apellido: string, alias: string, email: string} retorna:
     const nombre = req.body.nombre;
     const apellido = req.body.apellido;
     const alias = req.body.alias;
     const email = req.body.email;
-    let persona = {
+    var persona = {
       nombre: req.body.nombre,
       apellido: req.body.apellido,
       alias: req.body.alias,
-      email: req.body.email
-    }
+      email: req.body.email,
+    };
     const respuesta = await conexion.query(
-      "INSERT INTO persona (nombre, apellido, alias, email) values (?, ?, ?, ?)", 
+      "INSERT INTO persona (nombre, apellido, alias, email) values (?, ?, ?, ?)",
       [nombre, apellido, alias, email]
-    );    
-    res.status(200).send({persona});    
+    );
+    console.log(respuesta);
+    if (respuesta.insertId > 0) {
+      persona.id = respuesta.insertId;
+      console.log(persona);
+      res.status(200).send({ persona: persona }); //    {mensaje: "se borro correctamente"}
+    } else {
+      throw new Error("No se pudo insertar");
+    }
+    console.log(persona);
+    //res.status(200).send({ persona });
   } catch (error) {
     // ser: "faltan datos", "el email ya se encuentra registrado", "error inesperado"
     res.status(413).send({ message: error.message });
@@ -147,9 +156,11 @@ app.get("/persona/:id", async (req, res) => {
     if (isNaN(persona_id)) {
       throw new Error("Error inesperado el id no es un numero");
     }
-    const respuesta = await conexion.query("SELECT * FROM persona WHERE id=?", [persona_id]);
+    const respuesta = await conexion.query("SELECT * FROM persona WHERE id=?", [
+      persona_id,
+    ]);
     if (respuesta.lenght == 1) {
-      res.status(200).send(respuesta[0])
+      res.status(200).send(respuesta[0]);
     } else if (respuesta.length == 0) {
       throw new Error("La persona no fue encontrada");
     }
