@@ -148,7 +148,7 @@ app.get("/persona/:id", async (req, res) => {
       throw new Error("Error inesperado el id no es un numero");
     }
     const respuesta = await conexion.query("SELECT * FROM persona WHERE id=?", [persona_id]);
-    if (respuesta.lenght == 1) {
+    if (respuesta.length == 1) {
       res.status(200).send(respuesta[0])
     } else if (respuesta.length == 0) {
       throw new Error("La persona no fue encontrada");
