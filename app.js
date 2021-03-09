@@ -38,7 +38,6 @@ app.post("/categoria", async (req, res) => {
     } else {
       // TODO
     }
-
     // console.log(respuesta);
     // recibe: {nombre: string}
     // {id: numerico, nombre: string}
@@ -110,10 +109,24 @@ app.delete("/categoria/:id", async (req, res) => {
 });
 
 // Persona
-app.post("/persona", function (req, res) {
-  try {
-    //  recibe: {nombre: string, apellido: string, alias: string, email: string} retorna:
-    res.status(200).send("TODO"); //  {id: numerico, nombre: string, apellido: string, alias: string, email: string}
+app.post("/persona", async (req, res) => {
+  try {    
+    //recibe: {nombre: string, apellido: string, alias: string, email: string} retorna:
+    const nombre = req.body.nombre;
+    const apellido = req.body.apellido;
+    const alias = req.body.alias;
+    const email = req.body.email;
+    let persona = {
+      nombre: req.body.nombre,
+      apellido: req.body.apellido,
+      alias: req.body.alias,
+      email: req.body.email
+    }
+    const respuesta = await conexion.query(
+      "INSERT INTO persona (nombre, apellido, alias, email) values (?, ?, ?, ?)", 
+      [nombre, apellido, alias, email]
+    );    
+    res.status(200).send({ message: "Se inserto: " + persona });    
   } catch (error) {
     // ser: "faltan datos", "el email ya se encuentra registrado", "error inesperado"
     res.status(413).send({ message: error.message });
