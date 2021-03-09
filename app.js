@@ -80,7 +80,6 @@ app.get("/categoria/:id", async (req, res) => {
     } else if (respuesta.length == 0) {
       throw new Error("La categoria no fue encontrada");
     }
-
     //res.status(200).send(respuesta); //   {id: numerico, nombre:string}
   } catch (error) {
     // ser: "error inesperado", "categoria no encontrada"
@@ -126,24 +125,35 @@ app.post("/persona", async (req, res) => {
       "INSERT INTO persona (nombre, apellido, alias, email) values (?, ?, ?, ?)", 
       [nombre, apellido, alias, email]
     );    
-    res.status(200).send({ message: "Se inserto: " + persona });    
+    res.status(200).send({persona});    
   } catch (error) {
     // ser: "faltan datos", "el email ya se encuentra registrado", "error inesperado"
     res.status(413).send({ message: error.message });
   }
 });
 
-app.get("/persona", function (req, res) {
+app.get("/persona", async (req, res) => {
   try {
-    res.status(200).send("TODO"); // [{id: numerico, nombre: string, apellido: string, alias: string, email; string}]
+    const respuesta = await conexion.query("SELECT * FROM persona");
+    res.status(200).send(respuesta); // [{id: numerico, nombre: string, apellido: string, alias: string, email; string}]
   } catch (error) {
     res.status(413).send({ message: error.message });
   }
 });
 
-app.get("/persona/:id", function (req, res) {
+app.get("/persona/:id", async (req, res) => {
   try {
-    res.status(200).send("TODO"); //  {id: numerico, nombre: string, apellido: string, alias: string, email; string}
+    var persona_id = req.params.id;
+    if (isNaN(persona_id)) {
+      throw new Error("Error inesperado el id no es un numero");
+    }
+    const respuesta = await conexion.query("SELECT * FROM persona WHERE id=?", [persona_id]);
+    if (respuesta.lenght == 1) {
+      res.status(200).send(respuesta[0])
+    } else if (respuesta.length == 0) {
+      throw new Error("La persona no fue encontrada");
+    }
+    //  {id: numerico, nombre: string, apellido: string, alias: string, email; string}
   } catch (error) {
     // "error inesperado", "no se encuentra esa persona"
     res.status(413).send({ message: error.message });
