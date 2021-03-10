@@ -156,9 +156,9 @@ app.get("/persona/:id", async (req, res) => {
     if (isNaN(persona_id)) {
       throw new Error("Error inesperado el id no es un numero");
     }
-    const respuesta = await conexion.query("SELECT * FROM persona WHERE id=?", [
-      persona_id,
-    ]);
+    const respuesta = await conexion.query("SELECT * FROM persona WHERE id=?", 
+      [persona_id,]
+    );
     if (respuesta.lenght == 1) {
       res.status(200).send(respuesta[0]);
     } else if (respuesta.length == 0) {
@@ -171,10 +171,22 @@ app.get("/persona/:id", async (req, res) => {
   }
 });
 
-app.put("/persona/:id", function (req, res) {
+app.put("/persona/:id", async (req, res) => {
   try {
+    var persona_id = req.params.id;
+    const nombre = req.body.nombre;
+    const apellido = req.body.apellido;
+    const alias = req.body.alias;
+    
+    if (isNaN(persona_id)) {
+      throw new Error("Error inesperado el id no es un numero");
+    }  
+    const respuesta = await conexion.query(
+      "UPDATE persona SET nombre=?, apellido=?, alias=? WHERE id=?", 
+      [nombre, apellido, alias, persona_id]);
     //recibe: {nombre: string, apellido: string, alias: string, email: string} el email no se puede modificar.
-    res.status(200).send("TODO"); //y el objeto modificado o
+    const registroInertado = await conexion.query('select * from persona where id=?', [req.params.id]);
+    res.json(registroInertado[0]); //y el objeto modificado o
   } catch (error) {
     //"error inesperado", "no se encuentra esa persona"
     res.status(413).send({ message: error.message });
