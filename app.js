@@ -5,38 +5,40 @@ const mysql = require("mysql");
 const util = require("util");
 
 const app = express();
-// Test juan prueba
+
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
+// Conexion a la Db.
 var conexion = require("./db");
 
 app.get("/", function (req, res) {
   try {
-    res.send("Hola UTN");
+    res.send(
+      "Este es un proyecto para el curso de la UTN por favor leer el Readmi."
+    );
   } catch (error) {
     res.status(413).send({ message: error.message });
   }
 });
 
-// Login /
-
 // Categoria
 // No se debe implementar el PUT
 app.post("/categoria", async (req, res) => {
   try {
-    const nombre = req.body.nombre; // Hacer verificacion de la categoria.
+    if (!req.body.nombre) {
+      throw new Error("Faltan datos de la categoria.");
+    }
+    const nombre = req.body.nombre;
 
     const respuesta = await conexion.query(
       "INSERT INTO categoria (nombre) values (?)",
       [nombre]
     );
     if (respuesta.insertId > 0) {
-      res
-        .status(200)
-        .send({ message: "Se inserto el id " + respuesta.insertId.toString() });
+      res.status(200).send({ id: respuesta.insertId, nombre: nombre });
     } else {
-      // TODO
+      throw new Error("Error inesperado.");
     }
     // console.log(respuesta);
     // recibe: {nombre: string}
@@ -79,6 +81,8 @@ app.get("/categoria/:id", async (req, res) => {
       res.status(200).send(respuesta[0]);
     } else if (respuesta.length == 0) {
       throw new Error("La categoria no fue encontrada");
+    } else {
+      throw new Error("Error inesperado");
     }
     //res.status(200).send(respuesta); //   {id: numerico, nombre:string}
   } catch (error) {
@@ -94,12 +98,35 @@ app.delete("/categoria/:id", async (req, res) => {
     if (isNaN(categoria_id)) {
       throw new Error("Error inesperado el id no es un numero");
     }
-    const respuesta = await conexion.query("DELETE FROM categoria WHERE id=?", [
-      categoria_id,
-    ]);
-    if (respuesta.affectedRows == 1) {
-      res.status(200).send({ message: "se borro el registro " + categoria_id }); //    {mensaje: "se borro correctamente"}
+    const librosCategoria = await conexion.query(
+      "SELECT COUNT(id) as idCount FROM libro WHERE categoria_id=?",
+      [categoria_id]
+    );
+    if (librosCategoria[0].idCount > 0) {
+      throw new Error("Categoria con libros asociados, no se puede eliminar");
     }
+    console.log("Verifiacamos el delete");
+    var catExiste = await conexion.query(
+      "SELECT COUNT(id) as idCount FROM categoria WHERE id=?",
+      [categoria_id]
+    );
+
+    if (catExiste[0].idCount == 1) {
+      const respuesta = await conexion.query(
+        "DELETE FROM categoria WHERE id=?",
+        [categoria_id]
+      );
+      if (respuesta.affectedRows == 1) {
+        res
+          .status(200)
+          .send({ message: "se borro el registro " + categoria_id }); //    {mensaje: "se borro correctamente"}
+      } else {
+        throw new Error("Error inesperado");
+      }
+    } else {
+      throw new Error("No existe la categoria indicada");
+    }
+
     //console.log(respuesta);
   } catch (error) {
     // er: "error inesperado", "categoria con libros asociados, no se puede eliminar", "no existe la categoria indicada"
@@ -156,9 +183,9 @@ app.get("/persona/:id", async (req, res) => {
     if (isNaN(persona_id)) {
       throw new Error("Error inesperado el id no es un numero");
     }
-    const respuesta = await conexion.query("SELECT * FROM persona WHERE id=?", 
-      [persona_id,]
-    );
+    const respuesta = await conexion.query("SELECT * FROM persona WHERE id=?", [
+      persona_id,
+    ]);
     if (respuesta.lenght == 1) {
       res.status(200).send(respuesta[0]);
     } else if (respuesta.length == 0) {
@@ -177,16 +204,19 @@ app.put("/persona/:id", async (req, res) => {
     const nombre = req.body.nombre;
     const apellido = req.body.apellido;
     const alias = req.body.alias;
-    
+
     if (isNaN(persona_id)) {
       throw new Error("Error inesperado el id no es un numero");
-    }  
+    }
     const respuesta = await conexion.query(
-      "UPDATE persona SET nombre=?, apellido=?, alias=? WHERE id=?", 
+      "UPDATE persona SET nombre=?, apellido=?, alias=? WHERE id=?",
       [nombre, apellido, alias, persona_id]
     );
     //recibe: {nombre: string, apellido: string, alias: string, email: string} el email no se puede modificar.
-    const registroInertado = await conexion.query('select * from persona where id=?', [req.params.id]);
+    const registroInertado = await conexion.query(
+      "select * from persona where id=?",
+      [req.params.id]
+    );
     res.json(registroInertado[0]); //y el objeto modificado o
   } catch (error) {
     //"error inesperado", "no se encuentra esa persona"
@@ -200,11 +230,10 @@ app.delete("/persona/:id", async (req, res) => {
     if (isNaN(persona_id)) {
       throw new Error("Error inesperado el id no es un numero");
     }
-    const respuesta = await conexion.query(
-      "DELETE FROM persona WHERE id=?",
-      [persona_id]
-    );
-    res.status(200).send({messaje: "se borro correctamente"}); // retorna: 200 y {mensaje: "se borro correctamente"}
+    const respuesta = await conexion.query("DELETE FROM persona WHERE id=?", [
+      persona_id,
+    ]);
+    res.status(200).send({ messaje: "se borro correctamente" }); // retorna: 200 y {mensaje: "se borro correctamente"}
   } catch (error) {
     //"error inesperado", "no existe esa persona", "esa persona tiene libros asociados, no se puede eliminar"
     res.status(413).send({ message: error.message });
