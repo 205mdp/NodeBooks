@@ -183,7 +183,8 @@ app.put("/persona/:id", async (req, res) => {
     }  
     const respuesta = await conexion.query(
       "UPDATE persona SET nombre=?, apellido=?, alias=? WHERE id=?", 
-      [nombre, apellido, alias, persona_id]);
+      [nombre, apellido, alias, persona_id]
+    );
     //recibe: {nombre: string, apellido: string, alias: string, email: string} el email no se puede modificar.
     const registroInertado = await conexion.query('select * from persona where id=?', [req.params.id]);
     res.json(registroInertado[0]); //y el objeto modificado o
@@ -193,9 +194,17 @@ app.put("/persona/:id", async (req, res) => {
   }
 });
 
-app.delete("/persona/:id", function (req, res) {
+app.delete("/persona/:id", async (req, res) => {
   try {
-    res.status(200).send("TODO"); // retorna: 200 y {mensaje: "se borro correctamente"}
+    var persona_id = req.params.id;
+    if (isNaN(persona_id)) {
+      throw new Error("Error inesperado el id no es un numero");
+    }
+    const respuesta = await conexion.query(
+      "DELETE FROM persona WHERE id=?",
+      [persona_id]
+    );
+    res.status(200).send({messaje: "se borro correctamente"}); // retorna: 200 y {mensaje: "se borro correctamente"}
   } catch (error) {
     //"error inesperado", "no existe esa persona", "esa persona tiene libros asociados, no se puede eliminar"
     res.status(413).send({ message: error.message });
