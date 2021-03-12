@@ -483,9 +483,35 @@ app.put("/libro/devolver/:id", async function (req, res) {
   }
 });
 
-app.delete("/libro/:id", function (req, res) {
+app.delete("/libro/:id", async function (req, res) {
   try {
-    res.status(200).send("TODO"); //  {mensaje: "se borro correctamente"}
+    const libro_id = req.params.id;
+    if (isNaN(libro_id)) {
+      throw new Error("Error inesperado el id no es un numero");
+    }
+
+    // ver si el libro esta prestado
+    const libro_data = await conexion.query(
+      "SELECT persona_id FROM libro WHERE id=?",
+      [libro_id]
+    );
+    if (libro_data.length == 1) {
+      if (libro_data[0].persona_id != null) {
+        throw new Error("El libro esta prestado no se puede borrar");
+      } else {
+        const respuesta = await conexion.query("DELETE FROM libro WHERE id=?", [
+          libro_id,
+        ]);
+        if (respuesta.affectedRows == 1) {
+          res.status(200).send({ mensaje: "Se borro correctamente el libro" });
+        } else {
+          throw new Error("Error inesperado.");
+        }
+      }
+    } else {
+      throw new Error("No se encontro ese libro.");
+    }
+    //  {mensaje: "se borro correctamente"}
   } catch (error) {
     "error inesperado",
       "no se encuentra ese libro",
