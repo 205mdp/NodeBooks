@@ -242,10 +242,59 @@ app.delete("/persona/:id", async (req, res) => {
 
 // Libro
 
-app.post("/libro", function (req, res) {
+// Inserta un libro en la DB
+app.post("/libro", async function (req, res) {
   try {
     //ecibe: {nombre:string, descripcion:string, categoria_id:numero, persona_id:numero/null}
-    res.status(200).send({ message: error.message }); // {id: numero, nombre:string, descripcion:string, categoria_id:numero, persona_id:numero/null}
+    if (!req.body.nombre || !req.body.descripcion || !req.body.categoria_id) {
+      // TODO sacar descripcion y modificar la DB para que sea nullable.
+      throw new Error("Los campos nombre y categoria son obligarios.");
+    }
+    console.log(req.body);
+    var libro = {
+      nombre: req.body.nombre,
+      descripcion: req.body.descripcion,
+      categoria_id: req.body.categoria_id,
+      persona_id: !req.body.persona_id ? null : req.body.persona_id,
+    };
+    console.log(libro);
+    const libroOk = await conexion.query(
+      "SELECT COUNT(id) as idCount FROM libro WHERE nombre=?",
+      [libro.nombre]
+    );
+    if (libroOk[0].idCount > 0) {
+      throw new Error("El libro ya existe");
+    }
+
+    const cateok = await conexion.query(
+      "SELECT COUNT(id) as idCount FROM categoria WHERE id=?",
+      [libro.categoria_id]
+    );
+    if (cateok[0].idCount == 0) {
+      throw new Error("No existe la categoria indicada");
+    }
+    if (libro.persona_id != null) {
+      const personaOk = await conexion.query(
+        "SELECT COUNT(id) as idCount FROM persona WHERE id=?",
+        [libro.persona_id]
+      );
+      if (personaOk[0].idCount == 0) {
+        throw new Error("No existe la persona indicada.");
+      }
+    }
+    const respuesta = await conexion.query(
+      "INSERT INTO libro (nombre, descripcion, categoria_id, persona_id) values (?, ?, ?, ?)",
+      [libro.nombre, libro.descripcion, libro.categoria_id, libro.persona_id]
+    );
+
+    if (respuesta.insertId > 0) {
+      libro.id = respuesta.insertId;
+      res.status(200).send(libro);
+    } else {
+      throw new Error("Error inesperado");
+    }
+    //ecibe: {nombre:string, descripcion:string, categoria_id:numero, persona_id:numero/null}
+    //res.status(200).send({ message: error.message }); // {id: numero, nombre:string, descripcion:string, categoria_id:numero, persona_id:numero/null}
   } catch (error) {
     // "error inesperado", "ese libro ya existe", "nombre y categoria son datos obligatorios", "no existe la categoria indicada", "no existe la persona indicada"
     res.status(413).send({ message: error.message });
