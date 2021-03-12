@@ -349,10 +349,41 @@ app.get("/libro/:id", async function (req, res) {
   }
 });
 
-app.put("/libro/:id", function (req, res) {
+app.put("/libro/:id", async function (req, res) {
   try {
+    const libro_id = req.params.id;
+    if (isNaN(libro_id)) {
+      throw new Error("Error inesperado el id no es un numero");
+    }
+    if (!req.body.descripcion) {
+      throw new Error("Debe enviar la descripción");
+    }
+    const descripcion = req.body.descripcion;
+    // Verificamos si manda mas parametros aparte de la descripcion.
+    if (Object.keys(req.body).length > 1) {
+      throw new Error("Solo se puede modificar la descripcion del libro.");
+    }
+
+    const respuesta = await conexion.query(
+      "UPDATE libro SET descripcion=? WHERE id=?",
+      [descripcion, libro_id]
+    );
+    if (respuesta.affectedRows == 1) {
+      const libro_data = await conexion.query(
+        "SELECT * FROM libro WHERE id=?",
+        [libro_id]
+      );
+      if (libro_data.length == 1) {
+        res.status(200).send(libro_data[0]);
+      } else {
+        throw new Error("Error inesperado.");
+      }
+    } else {
+      throw new Error("Error inesperado.");
+    }
+
     //  {id: numero, nombre:string, descripcion:string, categoria_id:numero, persona_id:numero/null}
-    res.status(200).send("TODO"); //  {id: numero, nombre:string, descripcion:string, categoria_id:numero, persona_id:numero/null}
+    //  {id: numero, nombre:string, descripcion:string, categoria_id:numero, persona_id:numero/null}
   } catch (error) {
     //  "solo se puede modificar la descripcion del libro
     res.status(413).send({ message: error.message });
