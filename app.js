@@ -311,6 +311,7 @@ app.post("/libro", async function (req, res) {
 
 app.get("/libro", async function (req, res) {
   try {
+    // buscamos los libros en la db
     const respuesta = await conexion.query("SELECT * FROM libro");
     res.status(200).send(respuesta);
 
@@ -324,14 +325,15 @@ app.get("/libro", async function (req, res) {
 app.get("/libro/:id", async function (req, res) {
   try {
     var libro_id = req.params.id;
+    // verificamos que el id sea un numero.
     if (isNaN(libro_id)) {
       throw new Error("Error inesperado el id no es un numero");
     }
+    // consultamos el libro en la db.
     const respuesta = await conexion.query("SELECT * FROM libro WHERE id=?", [
       libro_id,
     ]);
-    console.log(respuesta);
-    console.log(respuesta.length);
+
     if (respuesta.length == 1) {
       res.status(200).send(respuesta[0]);
     } else if (respuesta.length == 0) {
