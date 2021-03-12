@@ -390,10 +390,56 @@ app.put("/libro/:id", async function (req, res) {
   }
 });
 
-app.put("/libro/prestar/:id", function (req, res) {
+app.put("/libro/prestar/:id", async function (req, res) {
   try {
+    const libro_id = req.params.id;
+    if (isNaN(libro_id)) {
+      throw new Error("Error inesperado el id no es un numero");
+    }
+    if (!req.body.persona_id) {
+      throw new Error("Debe enviar a quien le presta el libro ");
+    }
+    const persona_id = req.body.persona_id;
+
+    // ver si el libro esta prestado
+    console.log("por sele");
+    const libro_data = await conexion.query("SELECT * FROM libro WHERE id=?", [
+      libro_id,
+    ]);
+    console.log("pase liv");
+    if (libro_data.length == 1) {
+      if (libro_data[0].persona_id != null) {
+        throw new Error(
+          "El libro ya esta prestado, no se puede prestar hasta que no se devuelva"
+        );
+      }
+    } else {
+      throw new Error("No se encontro el libro.");
+    }
+
+    const persona = await conexion.query("SELECT id FROM persona WHERE id=?", [
+      persona_id,
+    ]);
+
+    if (persona.length != 1) {
+      throw new Error(
+        "no se encontro la persona a la que se quiere prestar el libro"
+      );
+    } else {
+      console.log("por update");
+      const respuesta = await conexion.query(
+        "UPDATE libro SET persona_id=? WHERE id=?",
+        [persona_id, libro_id]
+      );
+      if (respuesta.affectedRows == 1) {
+        res.status(200).send({ mensaje: "se presto correctamente" });
+      } else {
+        throw new Error("Error inesperado");
+      }
+    }
+
     // {id:numero, persona_id:numero}
-    res.status(200).send("TODO"); //  {mensaje: "se presto correctamente"}
+    //  {mensaje: "se presto correctamente"}
   } catch (error) {
     "error inesperado",
       "el libro ya se encuentra prestado, no se puede prestar hasta que no se devuelva",
@@ -403,9 +449,34 @@ app.put("/libro/prestar/:id", function (req, res) {
   }
 });
 
-app.put("/libro/devolver/:id", function (req, res) {
+app.put("/libro/devolver/:id", async function (req, res) {
   try {
-    res.status(200).send("TODO"); //{mensaje: "se realizo la devolucion correctamente"}
+    const libro_id = req.params.id;
+    if (isNaN(libro_id)) {
+      throw new Error("Error inesperado el id no es un numero");
+    }
+
+    // ver si el libro esta prestado
+    const libro_data = await conexion.query("SELECT * FROM libro WHERE id=?", [
+      libro_id,
+    ]);
+    if (libro_data.length == 1) {
+      if (libro_data[0].persona_id == null) {
+        throw new Error("El libro no estaba prestado");
+      }
+    } else {
+      throw new Error("No se encontro el libro.");
+    }
+
+    const respuesta = await conexion.query(
+      "UPDATE libro SET persona_id=? WHERE id=?",
+      [null, libro_id]
+    );
+    if (respuesta.affectedRows == 1) {
+      res.status(200).send({ mensaje: "se devolvio correctamente" });
+    } else {
+      throw new Error("Error inesperado");
+    }
   } catch (error) {
     // "error inesperado", "ese libro no estaba prestado!", "ese libro no existe"
     res.status(413).send({ message: error.message });
