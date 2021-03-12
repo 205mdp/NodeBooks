@@ -246,34 +246,41 @@ app.delete("/persona/:id", async (req, res) => {
 app.post("/libro", async function (req, res) {
   try {
     //ecibe: {nombre:string, descripcion:string, categoria_id:numero, persona_id:numero/null}
+    // Verificamos que los campos tengan los datos requeridos
     if (!req.body.nombre || !req.body.descripcion || !req.body.categoria_id) {
       // TODO sacar descripcion y modificar la DB para que sea nullable.
       throw new Error("Los campos nombre y categoria son obligarios.");
     }
-    console.log(req.body);
+    // creamos el libro que vamos a insertar y devolver.
     var libro = {
       nombre: req.body.nombre,
       descripcion: req.body.descripcion,
       categoria_id: req.body.categoria_id,
       persona_id: !req.body.persona_id ? null : req.body.persona_id,
     };
-    console.log(libro);
+    // Verificamos si el libro existe, lo podriamos hacer manejando el error de SQL
+    // pero es un curso de web no de sql.
     const libroOk = await conexion.query(
       "SELECT COUNT(id) as idCount FROM libro WHERE nombre=?",
       [libro.nombre]
     );
+    // Si el libro existe da error, si no sigue.
     if (libroOk[0].idCount > 0) {
       throw new Error("El libro ya existe");
     }
-
+    // verificamos si la categoria existe.
     const cateok = await conexion.query(
       "SELECT COUNT(id) as idCount FROM categoria WHERE id=?",
       [libro.categoria_id]
     );
+    // Si la categoria no existe da error.
     if (cateok[0].idCount == 0) {
       throw new Error("No existe la categoria indicada");
     }
+
+    // Verificamos si la persona fue enviada.
     if (libro.persona_id != null) {
+      // Verificamos si la persona existe.
       const personaOk = await conexion.query(
         "SELECT COUNT(id) as idCount FROM persona WHERE id=?",
         [libro.persona_id]
@@ -282,11 +289,12 @@ app.post("/libro", async function (req, res) {
         throw new Error("No existe la persona indicada.");
       }
     }
+    // Insertamos el libro.
     const respuesta = await conexion.query(
       "INSERT INTO libro (nombre, descripcion, categoria_id, persona_id) values (?, ?, ?, ?)",
       [libro.nombre, libro.descripcion, libro.categoria_id, libro.persona_id]
     );
-
+    // Verificamos si nos devulve el id insertado.
     if (respuesta.insertId > 0) {
       libro.id = respuesta.insertId;
       res.status(200).send(libro);
