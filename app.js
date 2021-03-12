@@ -309,18 +309,38 @@ app.post("/libro", async function (req, res) {
   }
 });
 
-app.get("/libro", function (req, res) {
+app.get("/libro", async function (req, res) {
   try {
-    res.status(200).send("TODO"); //  [{id: numero, nombre:string, descripcion:string, categoria_id:numero, persona_id:numero/null}]
+    const respuesta = await conexion.query("SELECT * FROM libro");
+    res.status(200).send(respuesta);
+
+    //  [{id: numero, nombre:string, descripcion:string, categoria_id:numero, persona_id:numero/null}]
   } catch (error) {
     //  "error inesperado"
     res.status(413).send({ message: error.message });
   }
 });
 
-app.get("/libro/:id", function (req, res) {
+app.get("/libro/:id", async function (req, res) {
   try {
-    res.status(200).send("TODO"); // {id: numero, nombre:string, descripcion:string, categoria_id:numero, persona_id:numero/null}
+    var libro_id = req.params.id;
+    if (isNaN(libro_id)) {
+      throw new Error("Error inesperado el id no es un numero");
+    }
+    const respuesta = await conexion.query("SELECT * FROM libro WHERE id=?", [
+      libro_id,
+    ]);
+    console.log(respuesta);
+    console.log(respuesta.length);
+    if (respuesta.length == 1) {
+      res.status(200).send(respuesta[0]);
+    } else if (respuesta.length == 0) {
+      throw new Error("El libro no existe.");
+    } else {
+      throw new Error("Error inesperado.");
+    }
+
+    // {id: numero, nombre:string, descripcion:string, categoria_id:numero, persona_id:numero/null}
   } catch (error) {
     // "error inesperado", "no se encuentra ese libro"
     res.status(413).send({ message: error.message });
