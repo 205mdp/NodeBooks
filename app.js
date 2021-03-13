@@ -29,7 +29,7 @@ app.post("/categoria", async (req, res) => {
     if (!req.body.nombre) {
       throw new Error("Faltan datos de la categoria.");
     }
-    const nombre = req.body.nombre;
+    const nombre = req.body.nombre.toUpperCase();
 
     const respuesta = await conexion.query(
       "INSERT INTO categoria (nombre) values (?)",
@@ -138,16 +138,17 @@ app.delete("/categoria/:id", async (req, res) => {
 app.post("/persona", async (req, res) => {
   try {
     //recibe: {nombre: string, apellido: string, alias: string, email: string} retorna:
-    const nombre = req.body.nombre;
-    const apellido = req.body.apellido;
-    const alias = req.body.alias;
-    const email = req.body.email;
+    const nombre = req.body.nombre.toUpperCase();
+    const apellido = req.body.apellido.toUpperCase();
+    const alias = req.body.alias.toUpperCase();
+    const email = req.body.email.toUpperCase();
     var persona = {
       nombre: req.body.nombre,
       apellido: req.body.apellido,
       alias: req.body.alias,
       email: req.body.email,
     };
+    
     const respuesta = await conexion.query(
       "INSERT INTO persona (nombre, apellido, alias, email) values (?, ?, ?, ?)",
       [nombre, apellido, alias, email]
@@ -201,9 +202,9 @@ app.get("/persona/:id", async (req, res) => {
 app.put("/persona/:id", async (req, res) => {
   try {
     var persona_id = req.params.id;
-    const nombre = req.body.nombre;
-    const apellido = req.body.apellido;
-    const alias = req.body.alias;
+    const nombre = req.body.nombre.toUpperCase();
+    const apellido = req.body.apellido.toUpperCase();
+    const alias = req.body.alias.toUpperCase();
 
     if (isNaN(persona_id)) {
       throw new Error("Error inesperado el id no es un numero");
@@ -253,8 +254,8 @@ app.post("/libro", async function (req, res) {
     }
     // creamos el libro que vamos a insertar y devolver.
     var libro = {
-      nombre: req.body.nombre,
-      descripcion: req.body.descripcion,
+      nombre: req.body.nombre.toUpperCase(),
+      descripcion: req.body.descripcion.toUpperCase(),
       categoria_id: req.body.categoria_id,
       persona_id: !req.body.persona_id ? null : req.body.persona_id,
     };
