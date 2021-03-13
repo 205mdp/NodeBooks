@@ -1,17 +1,48 @@
 // Conexion a la Db.
 var conexion = require("./db");
 
-async function categoriasList() {}
+async function categoriasList() {
+  const respuesta = await conexion.query("SELECT * FROM categoria");
+  return respuesta;
+}
 
-async function categoriasAdd(categoria) {}
+async function categoriasAdd(categoria) {
+  const respuesta = await conexion.query(
+    "INSERT INTO categoria (nombre) values (?)",
+    [categoria.nombre]
+  );
+  return respuesta;
+}
 
-async function categoriasGet(id) {}
+async function categoriasGet(id) {
+  const respuesta = await conexion.query(
+    "SELECT id, nombre FROM categoria WHERE id=?",
+    [id]
+  );
+  return respuesta;
+}
 
-async function categoriasRemove(id) {}
+async function categoriasRemove(id) {
+  const respuesta = await conexion.query("DELETE FROM categoria WHERE id=?", [
+    categoria_id,
+  ]);
+  return respuesta;
+}
+
+// Categorias adicionales.
+
+async function categoriaByNombre(nombre) {
+  const respuesta = await conexion.query(
+    "SELECT id FROM categoria WHERE nombre=?",
+    [nombre]
+  );
+  return respuesta;
+}
 
 module.exports = {
   categoriasList,
   categoriasGet,
   categoriasAdd,
   categoriasRemove,
+  categoriaByNombre,
 };

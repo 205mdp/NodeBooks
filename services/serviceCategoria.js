@@ -20,6 +20,10 @@ function categoriasRemove(id) {
   return model.categoriasRemove(id);
 }
 
+function categoriaExiste(nombre) {
+  const datos = model.categoriaByNombre(nombre);
+}
+
 module.exports = {
   categoriasList,
   categoriasGet,
