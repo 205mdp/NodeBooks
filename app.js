@@ -1,6 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const rutasCategorias = require("./controllers/rutasCategorias");
+// const rutasPersonas = require("./controllers/rutasPersonas");
+// const rutasLibros = require("./controllers/rutasLibros");
+
 const app = express();
 
 app.use(express.json());
@@ -20,6 +23,8 @@ app.get("/", function (req, res) {
 });
 
 app.use("/api/categoria", rutasCategorias);
+// app.use("/api/persona", rutasPersonas);
+// app.use("/api/libro", rutasLibros);
 
 app.listen(PORT, () => {
   console.log("la app esta corriendo en localhost:" + PORT);
