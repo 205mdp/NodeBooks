@@ -32,7 +32,7 @@ app.post("/", async (req, res) => {
 
 app.get("/", async (req, res) => {
   try {
-    const respuesta = await service.Personalist();
+    const respuesta = await service.PersonaList();
     res.status(200).send(respuesta); // [{id: numerico, nombre: string, apellido: string, alias: string, email; string}]
   } catch (error) {
     res.status(413).send({ message: error.message });
