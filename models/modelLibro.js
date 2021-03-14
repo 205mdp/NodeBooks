@@ -76,4 +76,5 @@ module.exports = {
   libroCountCategoria,
   libroFindNombre,
   librosPrestar,
+  librosUpdate
 };
