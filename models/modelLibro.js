@@ -5,7 +5,7 @@ async function librosList() {
   return respuesta;
 }
 
-async function librosAdd(categoria) {
+async function librosAdd(libro) {
   const respuesta = await conexion.query(
     "INSERT INTO libro (nombre, descripcion, categoria_id, persona_id) values (?, ?, ?, ?)",
     [libro.nombre, libro.descripcion, libro.categoria_id, libro.persona_id]
@@ -31,7 +31,7 @@ async function librosRemove(id) {
   return respuesta;
 }
 
-async function libroPrestar(libro) {
+async function librosPrestar(libro) {
   const respuesta = await conexion.query(
     "UPDATE libro SET persona_id=? WHERE id=?",
     [libro.persona_id, libro.id]
@@ -58,6 +58,15 @@ async function libroCountCategoria(categoria_id) {
   return respuesta;
 }
 
+// Cuenta la cantidad de libros con categoria.
+async function libroFindNombre(nombre) {
+  const respuesta = await conexion.query(
+    "SELECT COUNT(id) as idCount FROM libro WHERE nombre=?",
+    [nombre]
+  );
+  return respuesta;
+}
+
 module.exports = {
   librosList,
   librosGet,
@@ -65,4 +74,6 @@ module.exports = {
   librosRemove,
   categoriaByNombre,
   libroCountCategoria,
+  libroFindNombre,
+  librosPrestar,
 };

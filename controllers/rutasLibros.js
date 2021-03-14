@@ -1,6 +1,8 @@
 const express = require("express");
 const service = require("../services/serviceLibro");
-// const libroService = require("../services/serviceLibro");
+const serviceCategoria = require("../services/serviceCategoria");
+const servicePersona = require("../services/servicePersona");
+
 const app = express.Router();
 
 // Inserta un libro en la DB
@@ -21,18 +23,16 @@ app.post("/libro", async function (req, res) {
     };
     // Verificamos si el libro existe, lo podriamos hacer manejando el error de SQL
     // pero es un curso de web no de sql.
-    const libroOk = await conexion.query(
-      "SELECT COUNT(id) as idCount FROM libro WHERE nombre=?",
-      [libro.nombre]
-    );
+
+    const libroOk = await service.libroFindNombre(libro.nombre);
     // Si el libro existe da error, si no sigue.
     if (libroOk[0].idCount > 0) {
       throw new Error("El libro ya existe");
     }
     // verificamos si la categoria existe.
-    const cateok = await conexion.query(
-      "SELECT COUNT(id) as idCount FROM categoria WHERE id=?",
-      [libro.categoria_id]
+
+    const cateok = await serviceCategoria.categoriaExisteById(
+      libro.categoria_id
     );
     // Si la categoria no existe da error.
     if (cateok[0].idCount == 0) {
@@ -46,15 +46,16 @@ app.post("/libro", async function (req, res) {
         "SELECT COUNT(id) as idCount FROM persona WHERE id=?",
         [libro.persona_id]
       );
+
+      const personaOk = await servicePersona.PersonaGet(libro.persona_id);
+
       if (personaOk[0].idCount == 0) {
         throw new Error("No existe la persona indicada.");
       }
     }
     // Insertamos el libro.
-    const respuesta = await conexion.query(
-      "INSERT INTO libro (nombre, descripcion, categoria_id, persona_id) values (?, ?, ?, ?)",
-      [libro.nombre, libro.descripcion, libro.categoria_id, libro.persona_id]
-    );
+
+    const respuesta = await service.librosAdd(libro);
     // Verificamos si nos devulve el id insertado.
     if (respuesta.insertId > 0) {
       libro.id = respuesta.insertId;
@@ -73,7 +74,8 @@ app.post("/libro", async function (req, res) {
 app.get("/libro", async function (req, res) {
   try {
     // buscamos los libros en la db
-    const respuesta = await conexion.query("SELECT * FROM libro");
+
+    const respuesta = await service.librosList();
     res.status(200).send(respuesta);
 
     //  [{id: numero, nombre:string, descripcion:string, categoria_id:numero, persona_id:numero/null}]
@@ -91,9 +93,8 @@ app.get("/libro/:id", async function (req, res) {
       throw new Error("Error inesperado el id no es un numero");
     }
     // consultamos el libro en la db.
-    const respuesta = await conexion.query("SELECT * FROM libro WHERE id=?", [
-      libro_id,
-    ]);
+
+    const respuesta = await service.librosGet(libro_id);
 
     if (respuesta.length == 1) {
       res.status(200).send(respuesta[0]);
@@ -125,15 +126,14 @@ app.put("/libro/:id", async function (req, res) {
       throw new Error("Solo se puede modificar la descripcion del libro.");
     }
 
-    const respuesta = await conexion.query(
-      "UPDATE libro SET descripcion=? WHERE id=?",
-      [descripcion, libro_id]
-    );
+    const libro = {
+      id: libro_id,
+      descripcion: descripcion,
+    };
+    const respuesta = await service.librosUpdate(libro);
+
     if (respuesta.affectedRows == 1) {
-      const libro_data = await conexion.query(
-        "SELECT * FROM libro WHERE id=?",
-        [libro_id]
-      );
+      const libro_data = await service.librosGet(libro.id);
       if (libro_data.length == 1) {
         res.status(200).send(libro_data[0]);
       } else {
@@ -164,9 +164,7 @@ app.put("/libro/prestar/:id", async function (req, res) {
 
     // ver si el libro esta prestado
     console.log("por sele");
-    const libro_data = await conexion.query("SELECT * FROM libro WHERE id=?", [
-      libro_id,
-    ]);
+    const libro_data = await service.librosGet(libro_id);
     console.log("pase liv");
     if (libro_data.length == 1) {
       if (libro_data[0].persona_id != null) {
@@ -178,9 +176,7 @@ app.put("/libro/prestar/:id", async function (req, res) {
       throw new Error("No se encontro el libro.");
     }
 
-    const persona = await conexion.query("SELECT id FROM persona WHERE id=?", [
-      persona_id,
-    ]);
+    const persona = await servicePersona.PersonaGet(persona_id);
 
     if (persona.length != 1) {
       throw new Error(
@@ -188,10 +184,12 @@ app.put("/libro/prestar/:id", async function (req, res) {
       );
     } else {
       console.log("por update");
-      const respuesta = await conexion.query(
-        "UPDATE libro SET persona_id=? WHERE id=?",
-        [persona_id, libro_id]
-      );
+
+      var libro = {
+        persona_id: persona_id,
+        id: libro_id,
+      };
+      const respuesta = await service.librosPrestar(libro);
       if (respuesta.affectedRows == 1) {
         res.status(200).send({ mensaje: "se presto correctamente" });
       } else {
@@ -221,6 +219,8 @@ app.put("/libro/devolver/:id", async function (req, res) {
     const libro_data = await conexion.query("SELECT * FROM libro WHERE id=?", [
       libro_id,
     ]);
+    const libro_data = await service.librosGet(libro_id);
+
     if (libro_data.length == 1) {
       if (libro_data[0].persona_id == null) {
         throw new Error("El libro no estaba prestado");
@@ -229,10 +229,12 @@ app.put("/libro/devolver/:id", async function (req, res) {
       throw new Error("No se encontro el libro.");
     }
 
-    const respuesta = await conexion.query(
-      "UPDATE libro SET persona_id=? WHERE id=?",
-      [null, libro_id]
-    );
+    var libro = {
+      persona_id: null,
+      id: libro_id,
+    };
+    const respuesta = await service.librosPrestar(libro);
+
     if (respuesta.affectedRows == 1) {
       res.status(200).send({ mensaje: "se devolvio correctamente" });
     } else {
@@ -251,18 +253,12 @@ app.delete("/libro/:id", async function (req, res) {
       throw new Error("Error inesperado el id no es un numero");
     }
 
-    // ver si el libro esta prestado
-    const libro_data = await conexion.query(
-      "SELECT persona_id FROM libro WHERE id=?",
-      [libro_id]
-    );
+    const libro_data = await service.librosGet(libro_id);
     if (libro_data.length == 1) {
       if (libro_data[0].persona_id != null) {
         throw new Error("El libro esta prestado no se puede borrar");
       } else {
-        const respuesta = await conexion.query("DELETE FROM libro WHERE id=?", [
-          libro_id,
-        ]);
+        const respuesta = await service.librosRemove(libro_id);
         if (respuesta.affectedRows == 1) {
           res.status(200).send({ mensaje: "Se borro correctamente el libro" });
         } else {
@@ -280,7 +276,5 @@ app.delete("/libro/:id", async function (req, res) {
     res.status(413).send({ message: error.message });
   }
 });
-
-
 
 module.exports = app;

@@ -39,10 +39,19 @@ async function categoriaByNombre(nombre) {
   return respuesta;
 }
 
+async function categoriaById(id) {
+  await conexion.query(
+    "SELECT COUNT(id) as idCount FROM categoria WHERE id=?",
+    [id]
+  );
+  return respuesta;
+}
+
 module.exports = {
   categoriasList,
   categoriasGet,
   categoriasAdd,
   categoriasRemove,
   categoriaByNombre,
+  categoriaById
 };

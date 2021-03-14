@@ -8,22 +8,36 @@ function librosGet(id) {
   return model.librosGet(id);
 }
 
-function librosAdd(categoria) {
-  return model.librosAdd(categoria);
+function librosAdd(libro) {
+  return model.librosAdd(libro);
 }
 
-function librosUpdate(categoria) {
-  return model.librosUpdate(categoria);
+function librosUpdate(libro) {
+  return model.librosUpdate(libro);
 }
 
 function librosRemove(id) {
   return model.librosRemove(id);
 }
+function librosPrestar(libro) {
+  return model.librosPrestar(libro);
+}
 
-function librosConCategoria(id_categoria) {
-  return model.libroCountCategoria(id_categoria);
+function librosContarCategoria(id_libro) {
+  return model.libroCountCategoria(id_libro);
+}
+
+function libroFindNombre(nombre) {
+  return model.libroFindNombre(nombre);
 }
 
 module.exports = {
-  librosConCategoria,
+  librosList,
+  librosGet,
+  librosAdd,
+  librosUpdate,
+  librosRemove,
+  librosPrestar,
+  librosContarCategoria,
+  libroFindNombre,
 };

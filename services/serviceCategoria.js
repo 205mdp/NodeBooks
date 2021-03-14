@@ -24,10 +24,15 @@ function categoriaExiste(nombre) {
   const datos = model.categoriaByNombre(nombre);
 }
 
+function categoriaExisteById(id) {
+  const datos = model.categoriaById(id);
+}
+
 module.exports = {
   categoriasList,
   categoriasGet,
   categoriasAdd,
   categoriasUpdate,
   categoriasRemove,
+  categoriaExisteById,
 };
