@@ -5,15 +5,11 @@ const app = express.Router();
 app.post("/persona", async (req, res) => {
     try {
       //recibe: {nombre: string, apellido: string, alias: string, email: string} retorna:
-      const nombre = req.body.nombre.toUpperCase();
-      const apellido = req.body.apellido.toUpperCase();
-      const alias = req.body.alias.toUpperCase();
-      const email = req.body.email.toUpperCase();
-      var persona = {
-        nombre: req.body.nombre,
-        apellido: req.body.apellido,
-        alias: req.body.alias,
-        email: req.body.email,
+    var persona = {
+        nombre: req.body.nombre.toUpperCase();
+        apellido: req.body.apellido.toUpperCase();
+        alias: req.body.alias.toUpperCase();
+        email: req.body.email.toUpperCase();
       };
       
       const respuesta = await service.PersonaAdd(persona);
