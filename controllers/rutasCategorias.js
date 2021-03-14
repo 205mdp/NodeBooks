@@ -84,8 +84,8 @@ app.delete("/:id", async (req, res) => {
     }
 
     var catExiste = await service.categoriasGet(categoria_id);
-    console.log(catExiste);
-    if (catExiste[0].id == categoria_id) {
+
+    if (catExiste.length != 0) {
       const respuesta = await service.categoriasRemove(categoria_id);
       if (respuesta.affectedRows == 1) {
         res
