@@ -1,4 +1,4 @@
-const model = require("../models/modelPersona");
+const model = require("./models/modelPersona");
 
 function PersonaList() {
   return model.PersonaList();

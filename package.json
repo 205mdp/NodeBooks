@@ -1,7 +1,7 @@
 {
   "name": "nodebooks",
   "version": "1.0.0",
-  "description": "",
+  "description": "Profesores: Ing. Orlando F. Brea y Lorena R. Izzo",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -20,5 +20,13 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.7"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/205mdp/NodeBooks.git"
+  },
+  "bugs": {
+    "url": "https://github.com/205mdp/NodeBooks/issues"
+  },
+  "homepage": "https://github.com/205mdp/NodeBooks#readme"
 }

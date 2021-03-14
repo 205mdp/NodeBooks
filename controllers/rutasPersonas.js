@@ -1,8 +1,9 @@
 const express = require("express");
 const service = require("../services/servicePersona");
 const app = express.Router();
-// Persona
-app.post("/persona", async (req, res) => {
+
+// /api/persona
+app.post("/", async (req, res) => {
     try {
       //recibe: {nombre: string, apellido: string, alias: string, email: string} retorna:
     var persona = {
@@ -29,7 +30,7 @@ app.post("/persona", async (req, res) => {
     }
   });
   
-  app.get("/persona", async (req, res) => {
+  app.get("/", async (req, res) => {
     try {
       const respuesta = await service.Personalist();
       res.status(200).send(respuesta); // [{id: numerico, nombre: string, apellido: string, alias: string, email; string}]
@@ -38,7 +39,7 @@ app.post("/persona", async (req, res) => {
     }
   });
   
-  app.get("/persona/:id", async (req, res) => {
+  app.get("/:id", async (req, res) => {
     try {
       var persona_id = req.params.id;
       if (isNaN(persona_id)) {
@@ -57,7 +58,7 @@ app.post("/persona", async (req, res) => {
     }
   });
   
-  app.put("/persona/:id", async (req, res) => {
+  app.put("/:id", async (req, res) => {
     try {
       var persona_id = req.params.id;
       const nombre = req.body.nombre.toUpperCase();
@@ -80,7 +81,7 @@ app.post("/persona", async (req, res) => {
     }
   });
   
-  app.delete("/persona/:id", async (req, res) => {
+  app.delete("/:id", async (req, res) => {
     try {
       var persona_id = req.params.id;
       if (isNaN(persona_id)) {
