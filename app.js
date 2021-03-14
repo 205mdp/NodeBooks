@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const rutasCategorias = require("./controllers/rutasCategorias");
-//const rutasPersonas = require("./controllers/rutasPersonas");
+const rutasPersonas = require("./controllers/rutasPersonas");
 // const rutasLibros = require("./controllers/rutasLibros");
 
 const app = express();
@@ -23,7 +23,7 @@ app.get("/", function (req, res) {
 });
 
 app.use("/api/categoria", rutasCategorias);
-//app.use("/api/persona", rutasPersonas);
+app.use("/api/persona", rutasPersonas);
 
 // app.use("/api/libro", rutasLibros);
 

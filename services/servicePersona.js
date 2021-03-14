@@ -1,4 +1,4 @@
-const model = require("./models/modelPersona");
+const model = require("../models/modelPersona");
 
 function PersonaList() {
   return model.PersonaList();
@@ -7,7 +7,7 @@ function PersonaList() {
 function PersonaGet(id) {
   return model.PersonaGet(id);
 }
- 
+
 function PersonaAdd(Persona) {
   return model.PersonaAdd(Persona);
 }
@@ -30,5 +30,4 @@ module.exports = {
   PersonaAdd,
   PersonaUpdate,
   PersonaRemove,
-  
 };

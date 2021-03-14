@@ -10,7 +10,7 @@ function connectDatabase() {
     db = mysql.createConnection({
       host: "localhost",
       user: "root",
-      password: "",
+      password: "rootroot",
       database: "biblioteca",
     });
 
