@@ -23,7 +23,8 @@ app.get("/", function (req, res) {
 });
 
 app.use("/api/categoria", rutasCategorias);
-// app.use("/api/persona", rutasPersonas);
+app.use("/api/persona", rutasPersonas);
+
 // app.use("/api/libro", rutasLibros);
 
 app.listen(PORT, () => {
