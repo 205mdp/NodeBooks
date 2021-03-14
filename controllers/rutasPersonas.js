@@ -6,10 +6,10 @@ app.post("/persona", async (req, res) => {
     try {
       //recibe: {nombre: string, apellido: string, alias: string, email: string} retorna:
     var persona = {
-        nombre: req.body.nombre.toUpperCase();
-        apellido: req.body.apellido.toUpperCase();
-        alias: req.body.alias.toUpperCase();
-        email: req.body.email.toUpperCase();
+        nombre: req.body.nombre.toUpperCase(),
+        apellido: req.body.apellido.toUpperCase(),
+        alias: req.body.alias.toUpperCase(),
+        email: req.body.email.toUpperCase(),
       };
       
       const respuesta = await service.PersonaAdd(persona);
