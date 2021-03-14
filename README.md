@@ -10,7 +10,7 @@ Cammarota Federico /
 Casquero Ricardo /
 Damiani Juan /
 Maza Gabriel /
-Idysol Juan Pablo /
+Camean Fenoy Juan Pablo /
 Paak Jorge German
 
 ## Instalar
