@@ -24,7 +24,7 @@ async function categoriasGet(id) {
 
 async function categoriasRemove(id) {
   const respuesta = await conexion.query("DELETE FROM categoria WHERE id=?", [
-    categoria_id,
+    id,
   ]);
   return respuesta;
 }
