@@ -6,7 +6,7 @@ const servicePersona = require("../services/servicePersona");
 const app = express.Router();
 
 // Inserta un libro en la DB
-app.post("/libro", async function (req, res) {
+app.post("/", async function (req, res) {
   try {
     //ecibe: {nombre:string, descripcion:string, categoria_id:numero, persona_id:numero/null}
     // Verificamos que los campos tengan los datos requeridos
@@ -42,14 +42,10 @@ app.post("/libro", async function (req, res) {
     // Verificamos si la persona fue enviada.
     if (libro.persona_id != null) {
       // Verificamos si la persona existe.
-      const personaOk = await conexion.query(
-        "SELECT COUNT(id) as idCount FROM persona WHERE id=?",
-        [libro.persona_id]
-      );
 
       const personaOk = await servicePersona.PersonaGet(libro.persona_id);
 
-      if (personaOk[0].idCount == 0) {
+      if (personaOk.length == 0) {
         throw new Error("No existe la persona indicada.");
       }
     }
@@ -71,7 +67,7 @@ app.post("/libro", async function (req, res) {
   }
 });
 
-app.get("/libro", async function (req, res) {
+app.get("/", async function (req, res) {
   try {
     // buscamos los libros en la db
 
@@ -85,7 +81,7 @@ app.get("/libro", async function (req, res) {
   }
 });
 
-app.get("/libro/:id", async function (req, res) {
+app.get("/:id", async function (req, res) {
   try {
     var libro_id = req.params.id;
     // verificamos que el id sea un numero.
@@ -111,7 +107,7 @@ app.get("/libro/:id", async function (req, res) {
   }
 });
 
-app.put("/libro/:id", async function (req, res) {
+app.put("/:id", async function (req, res) {
   try {
     const libro_id = req.params.id;
     if (isNaN(libro_id)) {
@@ -151,7 +147,7 @@ app.put("/libro/:id", async function (req, res) {
   }
 });
 
-app.put("/libro/prestar/:id", async function (req, res) {
+app.put("/prestar/:id", async function (req, res) {
   try {
     const libro_id = req.params.id;
     if (isNaN(libro_id)) {
@@ -208,7 +204,7 @@ app.put("/libro/prestar/:id", async function (req, res) {
   }
 });
 
-app.put("/libro/devolver/:id", async function (req, res) {
+app.put("/devolver/:id", async function (req, res) {
   try {
     const libro_id = req.params.id;
     if (isNaN(libro_id)) {
@@ -216,9 +212,7 @@ app.put("/libro/devolver/:id", async function (req, res) {
     }
 
     // ver si el libro esta prestado
-    const libro_data = await conexion.query("SELECT * FROM libro WHERE id=?", [
-      libro_id,
-    ]);
+
     const libro_data = await service.librosGet(libro_id);
 
     if (libro_data.length == 1) {
@@ -246,7 +240,7 @@ app.put("/libro/devolver/:id", async function (req, res) {
   }
 });
 
-app.delete("/libro/:id", async function (req, res) {
+app.delete("/:id", async function (req, res) {
   try {
     const libro_id = req.params.id;
     if (isNaN(libro_id)) {
