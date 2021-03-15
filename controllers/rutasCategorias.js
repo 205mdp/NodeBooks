@@ -3,7 +3,9 @@ const service = require("../services/serviceCategoria");
 const libroService = require("../services/serviceLibro");
 const app = express.Router();
 
-// Post Add Categoria. api/categoria
+/*
+* POST /categoria/
+*/
 app.post("/", async (req, res) => {
   try {
     console.log(req.body.nombre);

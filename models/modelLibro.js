@@ -67,6 +67,13 @@ async function libroFindNombre(nombre) {
   return respuesta;
 }
 
+async function libroPrestadoPorPersona(id_persona) {
+  const respuesta = await conexion.query(
+    "SELECT id FROM libro WHERE persona_id=?",
+    [id_persona]
+  );
+}
+
 module.exports = {
   librosList,
   librosGet,
@@ -77,4 +84,5 @@ module.exports = {
   libroFindNombre,
   librosPrestar,
   librosUpdate,
+  libroPrestadoPorPersona,
 };
