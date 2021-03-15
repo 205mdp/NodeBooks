@@ -4,29 +4,33 @@ const libroService = require("../services/serviceLibro");
 const app = express.Router();
 
 /*
-* POST /categoria/
+* POST /categoria/ 
+*
+* @param {json} {nombre: string}
+* @return status: 200, {json} {id: numerico, nombre: string}
+* @return status: 413, {json} {mensaje: <descripcion del error>}
+* @mensajes "faltan datos", "ese nombre de categoria ya existe", "error inesperado"
 */
 app.post("/", async (req, res) => {
   try {
-    console.log(req.body.nombre);
+    // verificamos que envie nombre
     if (!req.body.nombre) {
       throw new Error("Faltan datos de la categoria.");
     }
     var categoria = {
       nombre: req.body.nombre.toUpperCase(),
     };
+    const categoriaExiste = await service.categoriaExisteById
     const respuesta = await service.categoriasAdd(categoria);
 
     if (respuesta.insertId > 0) {
       categoria.id = respuesta.insertId;
-      // res.status(200).send({ id: respuesta.insertId, nombre: categoria.nombre });
       res.status(200).send(categoria);
     } else {
       throw new Error("Error inesperado.");
     }
   } catch (error) {
-    // console.log(error);
-    // console.log(error);
+    // Verifica duplicado con la base de datos por posible error. 
     if (error.code == "ER_DUP_ENTRY") {
       res.status(413).send({ message: "Ese nombre de categoria ya existe" });
     }

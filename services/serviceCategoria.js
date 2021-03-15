@@ -21,11 +21,11 @@ function categoriasRemove(id) {
 }
 
 function categoriaExiste(nombre) {
-  const datos = model.categoriaByNombre(nombre);
+  return model.categoriaByNombre(nombre);
 }
 
 function categoriaExisteById(id) {
-  const datos = model.categoriaById(id);
+  return model.categoriaById(id);
 }
 
 module.exports = {
@@ -35,4 +35,5 @@ module.exports = {
   categoriasUpdate,
   categoriasRemove,
   categoriaExisteById,
+  categoriaExiste,
 };
