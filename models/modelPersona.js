@@ -15,17 +15,20 @@ async function PersonaList() {
 }
 
 async function PersonaGet(id) {
+  console.log(id);
   const respuesta = await conexion.query("SELECT * FROM persona WHERE id=?", [
     id,
   ]);
+  console.log(respuesta);
   return respuesta;
 }
 
 async function PersonaUpdate(persona) {
   const respuesta = await conexion.query(
     "UPDATE persona SET nombre=?, apellido=?, alias=? WHERE id=?",
-    [persona.nombre, persona.apellido, persona.alias, persona.persona_id]
+    [persona.nombre, persona.apellido, persona.alias, persona.id]
   );
+  console.log(respuesta);
   return respuesta;
 }
 
