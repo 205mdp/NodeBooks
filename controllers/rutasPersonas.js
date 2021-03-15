@@ -1,6 +1,7 @@
 const express = require("express");
 const { PersonaAdd, PersonaList } = require("../models/modelPersona");
 const service = require("../services/servicePersona");
+const serviceLibro = require("../services/serviceLibro");
 const app = express.Router();
 
 // /api/persona
@@ -107,19 +108,33 @@ app.put("/:id", async (req, res) => {
   }
 });
 
-app.delete("/:id", async (req, res) => {
+app.delete("/:id", async function (req, res) {
   try {
     var persona_id = req.params.id;
     if (isNaN(persona_id)) {
       throw new Error("Error inesperado el id no es un numero");
     }
-    // TODO COMPLETAR DELETE>
-    const respuesta = await service.PersonaRemove(persona_id);
-    res.status(200).send({ messaje: "se borro correctamente" }); // retorna: 200 y {mensaje: "se borro correctamente"}
-  } catch (error) {
-    //"error inesperado", "no existe esa persona", "esa persona tiene libros asociados, no se puede eliminar"
-    res.status(413).send({ message: error.message });
-  }
-});
+    
+      const persona_data = await service.PersonaGet(persona_id); 
+      if (persona_data.length == 1 ) {
+        if (serviceLibro.libroPrestadoPorPersona(persona_id) != null){
+          throw new Error("El libro esta prestado no se puede borrar");
+        } else {
+          const respuesta = await service.PersonaRemove(persona_id);
+          if (respuesta.affectedRows == 1) {
+            res.status(200).send({ mensaje: "Se borro correctamente la persona" });
+          } else {
+            throw new Error("Error inesperado.");
+          }
+        }
+      } else {
+        throw new Error("No se encontro la persona.");
+      }
+      //  {mensaje: "se borro correctamente"}
+    } catch (error) {
+      res.status(413).send({ message: error.message });
+    }
+  });
+     
 
 module.exports = app;
