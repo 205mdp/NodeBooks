@@ -45,7 +45,7 @@ app.get("/:id", async (req, res) => {
     if (isNaN(persona_id)) {
       throw new Error("Error inesperado el id no es un numero");
     }
-    const respuesta = await service.PersonaGet(perosna_id);
+    const respuesta = await service.PersonaGet(persona_id);
     if (respuesta.lenght == 1) {
       res.status(200).send(respuesta[0]);
     } else if (respuesta.length == 0) {
@@ -68,7 +68,7 @@ app.put("/:id", async (req, res) => {
     if (isNaN(persona_id)) {
       throw new Error("Error inesperado el id no es un numero");
     }
-    const respuesta = await service.PersonaUpdate(perosna);
+    const respuesta = await service.PersonaUpdate(persona);
     //recibe: {nombre: string, apellido: string, alias: string, email: string} el email no se puede modificar.
     const registroInertado = await conexion.query(
       "select * from persona where id=?",
@@ -87,7 +87,7 @@ app.delete("/:id", async (req, res) => {
     if (isNaN(persona_id)) {
       throw new Error("Error inesperado el id no es un numero");
     }
-    const respuesta = await service.PersonaRemove(perosna_id);
+    const respuesta = await service.PersonaRemove(persona_id);
     res.status(200).send({ messaje: "se borro correctamente" }); // retorna: 200 y {mensaje: "se borro correctamente"}
   } catch (error) {
     //"error inesperado", "no existe esa persona", "esa persona tiene libros asociados, no se puede eliminar"
