@@ -186,6 +186,8 @@ app.put("/prestar/:id", async function (req, res) {
         id: libro_id,
       };
       const respuesta = await service.librosPrestar(libro);
+      console.log(respuesta);
+
       if (respuesta.affectedRows == 1) {
         res.status(200).send({ mensaje: "se presto correctamente" });
       } else {
@@ -228,7 +230,7 @@ app.put("/devolver/:id", async function (req, res) {
       id: libro_id,
     };
     const respuesta = await service.librosPrestar(libro);
-
+    console.log(respuesta);
     if (respuesta.affectedRows == 1) {
       res.status(200).send({ mensaje: "se devolvio correctamente" });
     } else {

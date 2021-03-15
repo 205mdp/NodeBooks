@@ -75,8 +75,10 @@ app.delete("/:id", async (req, res) => {
       throw new Error("Error inesperado el id no es un numero");
     }
 
-    const librosCategoria = await libroService.librosConCategoria(categoria_id);
-
+    // const librosCategoria = await libroService.librosConCategoria(categoria_id);
+    const librosCategoria = await libroService.librosContarCategoria(
+      categoria_id
+    );
     if (librosCategoria[0].cantidad > 0) {
       throw new Error(
         `Categoria con ${librosCategoria[0].cantidad} libros asociados, no se puede eliminar`
