@@ -36,7 +36,7 @@ async function librosPrestar(libro) {
     "UPDATE libro SET persona_id=? WHERE id=?",
     [libro.persona_id, libro.id]
   );
-  respuesta;
+  return respuesta;
 }
 
 // libros adicionales.
@@ -76,5 +76,5 @@ module.exports = {
   libroCountCategoria,
   libroFindNombre,
   librosPrestar,
-  librosUpdate
+  librosUpdate,
 };

@@ -159,9 +159,9 @@ app.put("/prestar/:id", async function (req, res) {
     const persona_id = req.body.persona_id;
 
     // ver si el libro esta prestado
-    console.log("por sele");
+    
     const libro_data = await service.librosGet(libro_id);
-    console.log("pase liv");
+    
     if (libro_data.length == 1) {
       if (libro_data[0].persona_id != null) {
         throw new Error(
