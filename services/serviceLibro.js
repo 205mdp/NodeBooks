@@ -31,7 +31,7 @@ function libroFindNombre(nombre) {
   return model.libroFindNombre(nombre);
 }
 
-function libroPrestadoPorPersona(id_persona){
+function libroPrestadoPorPersona(id_persona) {
   return model.libroPrestadoPorPersona(id_persona);
 }
 module.exports = {
