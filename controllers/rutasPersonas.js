@@ -5,6 +5,15 @@ const serviceLibro = require("../services/serviceLibro");
 const app = express.Router();
 
 // /api/persona
+
+/*
+ * POST /api/persona/
+ *
+ * @param {json} {nombre: string, apellido:string, alias: string, email: string}
+ * @return status: 200, {json} {id: numerico, nombre: string, apellido:string, alias: string, email: string}
+ * @return status: 413, {json} {mensaje: <descripcion del error>}
+ * @mensajes "faltan datos", "el email ya se encutra registrado", "error inesperado"
+ */
 app.post("/", async (req, res) => {
   try {
     if (
@@ -40,6 +49,15 @@ app.post("/", async (req, res) => {
   }
 });
 
+/*
+ * GET /api/persona/
+ *
+ * @param nada.
+ * @return status: 200, {json} [{id: numerico, nombre: string, apellido:string, alias: string, email: string}]
+ * @return status: 413, {json} {mensaje: <descripcion del error>}
+ * @mensajes "error producido"
+ */
+
 app.get("/", async (req, res) => {
   try {
     const respuesta = await service.PersonaList();
@@ -48,6 +66,15 @@ app.get("/", async (req, res) => {
     res.status(413).send({ message: error.message });
   }
 });
+
+/*
+ * GET /api/persona/:id
+ *
+ * @param {numero} :id
+ * @return status: 200, {json} {id: numerico, nombre: string, apellido:string, alias: string, email: string}
+ * @return status: 413, {json} {mensaje: <descripcion del error>}
+ * @mensajes : "error inesperado", "nose encuntra esa persona"
+ */
 
 app.get("/:id", async (req, res) => {
   try {
@@ -69,6 +96,15 @@ app.get("/:id", async (req, res) => {
     res.status(413).send({ message: error.message });
   }
 });
+
+/*
+ * PUT /api/persona/:id
+ *
+ * @param {json} {id: numerico}
+ * @return status: 200, {json} {id: numerico ,nombre: string, apellido:string, alias: string, email: string}
+ * @return status: 413, {json} {mensaje: <descripcion del error>}
+ * @mensajes :  "error inesperado", "no se encontro esa persona",            
+ */
 
 app.put("/:id", async (req, res) => {
   try {
@@ -107,6 +143,16 @@ app.put("/:id", async (req, res) => {
     res.status(413).send({ message: error.message });
   }
 });
+
+/*
+ * DELETE /api/persona/:id
+ *
+ * @param {numero} :id
+ * @return status: 200, {json} { message: "se borro correctamente la persona"}
+ * @return status: 413, {json} {mensaje: <descripcion del error>}
+ * @mensajes :  "error inesperado", "no existe esa persona",
+ *              "esa persona tiene libros asociados, no se puede eliminar"
+ */
 
 app.delete("/:id", async function (req, res) {
   try {
