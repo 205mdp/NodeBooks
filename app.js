@@ -1,3 +1,15 @@
+/*
+ * TRABAJO PRACTIVO CURSO UTN 03/2021
+ *
+ * Profesores: Ing. Orlando F. Brea y Lorena R. Izzo
+ * Alumnos:
+ *   Maza Gabriel 
+ *   Camean Fenoy Juan Pablo 
+ *   Paak Jorge German
+ *   Cammarota Federico 
+ *   Casquero Ricardo 
+ *   Damiani Juan 
+ */
 const express = require("express");
 const cors = require("cors");
 const rutasCategorias = require("./controllers/rutasCategorias");
@@ -12,16 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const PORT = process.env.PORT ? process.env.PORT : 3000;
 
-app.get("/", function (req, res) {
-  try {
-    res.send(
-      "Este es un proyecto para el curso de la UTN por favor leer el Readmi."
-    );
-  } catch (error) {
-    res.status(413).send({ message: error.message });
-  }
-});
-
+// Rutas Api.
 app.use("/api/categoria", rutasCategorias);
 app.use("/api/persona", rutasPersonas);
 app.use("/api/libro", rutasLibros);

@@ -1,5 +1,4 @@
 const express = require("express");
-const { PersonaAdd, PersonaList } = require("../models/modelPersona");
 const service = require("../services/servicePersona");
 const serviceLibro = require("../services/serviceLibro");
 const app = express.Router();
