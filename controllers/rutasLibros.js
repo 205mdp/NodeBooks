@@ -13,7 +13,6 @@ const app = express.Router();
  * @return status: 413, {json} {mensaje: <descripcion del error>}
  * @mensajes "ese libro ya existe", "nombre y categoria son datos obligatorios", "no existe la categoria indicada", "no existe la persona indicada", "error inesperado"
  */
-
 app.post("/", async function (req, res) {
   try {
     if (!req.body.nombre || !req.body.descripcion || !req.body.categoria_id) {
@@ -70,7 +69,6 @@ app.post("/", async function (req, res) {
  * @mensajes "error inesperado"
  *
  */
-
 app.get("/", async function (req, res) {
   try {
     // buscamos los libros en la db
@@ -90,7 +88,6 @@ app.get("/", async function (req, res) {
  * @return status: 413, {json} {mensaje: <descripcion del error>}
  * @mensajes "no se encuentra el libro", "error inesperado"
  */
-
 app.get("/:id", async function (req, res) {
   try {
     var libro_id = req.params.id;
@@ -121,7 +118,6 @@ app.get("/:id", async function (req, res) {
  * @return status: 413, {json} {mensaje: <descripcion del error>}
  * @mensajes "solo se puede modificar la descripcion del libro", "error inesperado"
  */
-
 app.put("/:id", async function (req, res) {
   try {
     const libro_id = req.params.id;
@@ -229,7 +225,6 @@ app.put("/prestar/:id", async function (req, res) {
  * @return status: 413, {json} {mensaje: <descripcion del error>}
  * @mensajes "ese libro no esta prestado", "ese libro no existe", "error inesperado"
  */
-
 app.put("/devolver/:id", async function (req, res) {
   try {
     const libro_id = req.params.id;
@@ -271,7 +266,6 @@ app.put("/devolver/:id", async function (req, res) {
  * @return status: 413, {json} {mensaje: <descripcion del error>}
  * @mensajes "nose encuentra ese libro", "ese libro esta prestado no se puede borrar","error inesperado"
  */
-
 app.delete("/:id", async function (req, res) {
   try {
     const libro_id = req.params.id;

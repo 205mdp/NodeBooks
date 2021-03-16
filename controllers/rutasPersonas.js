@@ -4,8 +4,6 @@ const service = require("../services/servicePersona");
 const serviceLibro = require("../services/serviceLibro");
 const app = express.Router();
 
-// /api/persona
-
 /*
  * POST /api/persona/
  *
@@ -57,7 +55,6 @@ app.post("/", async (req, res) => {
  * @return status: 413, {json} {mensaje: <descripcion del error>}
  * @mensajes "error producido"
  */
-
 app.get("/", async (req, res) => {
   try {
     const respuesta = await service.PersonaList();
@@ -75,7 +72,6 @@ app.get("/", async (req, res) => {
  * @return status: 413, {json} {mensaje: <descripcion del error>}
  * @mensajes : "error inesperado", "nose encuntra esa persona"
  */
-
 app.get("/:id", async (req, res) => {
   try {
     var persona_id = req.params.id;
@@ -103,9 +99,8 @@ app.get("/:id", async (req, res) => {
  * @param {json} {id: numerico}
  * @return status: 200, {json} {id: numerico ,nombre: string, apellido:string, alias: string, email: string}
  * @return status: 413, {json} {mensaje: <descripcion del error>}
- * @mensajes :  "error inesperado", "no se encontro esa persona",            
+ * @mensajes :  "error inesperado", "no se encontro esa persona",
  */
-
 app.put("/:id", async (req, res) => {
   try {
     if (!req.body.nombre || !req.body.apellido || !req.body.alias) {
@@ -153,7 +148,6 @@ app.put("/:id", async (req, res) => {
  * @mensajes :  "error inesperado", "no existe esa persona",
  *              "esa persona tiene libros asociados, no se puede eliminar"
  */
-
 app.delete("/:id", async function (req, res) {
   try {
     var persona_id = req.params.id;
