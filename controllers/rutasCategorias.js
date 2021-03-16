@@ -4,13 +4,13 @@ const libroService = require("../services/serviceLibro");
 const app = express.Router();
 
 /*
-* POST /categoria/ 
-*
-* @param {json} {nombre: string}
-* @return status: 200, {json} {id: numerico, nombre: string}
-* @return status: 413, {json} {mensaje: <descripcion del error>}
-* @mensajes "faltan datos", "ese nombre de categoria ya existe", "error inesperado"
-*/
+ * POST /api/categoria/
+ *
+ * @param {json} {nombre: string}
+ * @return status: 200, {json} {id: numerico, nombre: string}
+ * @return status: 413, {json} {mensaje: <descripcion del error>}
+ * @mensajes "faltan datos", "ese nombre de categoria ya existe", "error inesperado"
+ */
 app.post("/", async (req, res) => {
   try {
     // verificamos que envie nombre
@@ -20,7 +20,11 @@ app.post("/", async (req, res) => {
     var categoria = {
       nombre: req.body.nombre.toUpperCase(),
     };
-    const categoriaExiste = await service.categoriaExisteById
+    // Tambien lo verifica con el duplicate de la DB.
+    const categoriaExiste = await service.categoriaExiste(categoria.nombre);
+    if (categoriaExiste) {
+      throw new Error("ese nombre de categoria ya existe");
+    }
     const respuesta = await service.categoriasAdd(categoria);
 
     if (respuesta.insertId > 0) {
@@ -30,28 +34,40 @@ app.post("/", async (req, res) => {
       throw new Error("Error inesperado.");
     }
   } catch (error) {
-    // Verifica duplicado con la base de datos por posible error. 
+    // Verifica duplicado con la base de datos por posible error.
     if (error.code == "ER_DUP_ENTRY") {
       res.status(413).send({ message: "Ese nombre de categoria ya existe" });
     }
-    // TODO puede ser: "faltan datos", "ese nombre de categoria ya existe", "error inesperado"
     res.status(413).send({ message: error.message });
   }
 });
 
-// GET api/Categoria
+/*
+ * GET /api/categoria/
+ *
+ * @param nada.
+ * @return status: 200, {json} [{id:numerico, nombre:string}]
+ * @return status: 413, {json} {mensaje: <descripcion del error>}
+ * @mensajes "error producido"
+ */
 app.get("/", async (req, res) => {
   try {
     const respuesta = await service.categoriasList();
-
     res.status(200).send(respuesta);
-
-    // res.status(200).send("TODO Categoria"); //  [{id:numerico, nombre:string}]
   } catch (error) {
-    res.status(413).send({ message: error.message });
+    res.status(413).send([]);
+    // res.status(413).send({ message: error.message });
   }
 });
 
+/*
+ * GET /api/categoria/:id
+ *
+ * @param {numero} :id
+ * @return status: 200, {json} {id:numerico, nombre:string}
+ * @return status: 413, {json} {mensaje: <descripcion del error>}
+ * @mensajes : "error inesperado", "categoria no encontrada"
+ */
 app.get("/:id", async (req, res) => {
   try {
     var categoria_id = req.params.id;
@@ -66,13 +82,20 @@ app.get("/:id", async (req, res) => {
     } else {
       throw new Error("Error inesperado");
     }
-    //res.status(200).send(respuesta); //   {id: numerico, nombre:string}
   } catch (error) {
-    // ser: "error inesperado", "categoria no encontrada"
     res.status(413).send({ message: error.message });
   }
 });
 
+/*
+ * DELETE /api/categoria/:id
+ *
+ * @param {numero} :id
+ * @return status: 200, {json} { message: "se borro el registro"}
+ * @return status: 413, {json} {mensaje: <descripcion del error>}
+ * @mensajes :  "error inesperado", "categoria con libros asociados, no se puede eliminar",
+ *              "no existe la categoria indicada"
+ */
 app.delete("/:id", async (req, res) => {
   try {
     // console.log("Catagoria por id" + req.params.id);
@@ -81,7 +104,6 @@ app.delete("/:id", async (req, res) => {
       throw new Error("Error inesperado el id no es un numero");
     }
 
-    // const librosCategoria = await libroService.librosConCategoria(categoria_id);
     const librosCategoria = await libroService.librosContarCategoria(
       categoria_id
     );
@@ -90,7 +112,6 @@ app.delete("/:id", async (req, res) => {
         `Categoria con ${librosCategoria[0].cantidad} libros asociados, no se puede eliminar`
       );
     }
-
     var catExiste = await service.categoriasGet(categoria_id);
 
     if (catExiste.length != 0) {
@@ -98,16 +119,14 @@ app.delete("/:id", async (req, res) => {
       if (respuesta.affectedRows == 1) {
         res
           .status(200)
-          .send({ message: "se borro el registro " + categoria_id }); //    {mensaje: "se borro correctamente"}
+          .send({ message: "se borro el registro " + categoria_id });
       } else {
         throw new Error("Error inesperado");
       }
     } else {
       throw new Error("No existe la categoria indicada");
     }
-    //console.log(respuesta);
   } catch (error) {
-    // er: "error inesperado", "categoria con libros asociados, no se puede eliminar", "no existe la categoria indicada"
     res.status(413).send({ message: error.message });
   }
 });
