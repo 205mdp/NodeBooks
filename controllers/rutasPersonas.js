@@ -114,27 +114,31 @@ app.delete("/:id", async function (req, res) {
     if (isNaN(persona_id)) {
       throw new Error("Error inesperado el id no es un numero");
     }
-    
-      const persona_data = await service.PersonaGet(persona_id); 
-      if (persona_data.length == 1 ) {
-        if (serviceLibro.libroPrestadoPorPersona(persona_id) != null){
-          throw new Error("El libro esta prestado no se puede borrar");
-        } else {
-          const respuesta = await service.PersonaRemove(persona_id);
-          if (respuesta.affectedRows == 1) {
-            res.status(200).send({ mensaje: "Se borro correctamente la persona" });
-          } else {
-            throw new Error("Error inesperado.");
-          }
-        }
+
+    const persona_data = await service.PersonaGet(persona_id);
+    if (persona_data.length == 1) {
+      const libroPrestad = await serviceLibro.libroPrestadoPorPersona(
+        persona_id
+      );
+      if (libroPrestad.length != 0) {
+        throw new Error("El libro esta prestado no se puede borrar");
       } else {
-        throw new Error("No se encontro la persona.");
+        const respuesta = await service.PersonaRemove(persona_id);
+        if (respuesta.affectedRows == 1) {
+          res
+            .status(200)
+            .send({ mensaje: "Se borro correctamente la persona" });
+        } else {
+          throw new Error("Error inesperado.");
+        }
       }
-      //  {mensaje: "se borro correctamente"}
-    } catch (error) {
-      res.status(413).send({ message: error.message });
+    } else {
+      throw new Error("No se encontro la persona.");
     }
-  });
-     
+    //  {mensaje: "se borro correctamente"}
+  } catch (error) {
+    res.status(413).send({ message: error.message });
+  }
+});
 
 module.exports = app;

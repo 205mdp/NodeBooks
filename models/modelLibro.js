@@ -72,6 +72,7 @@ async function libroPrestadoPorPersona(id_persona) {
     "SELECT id FROM libro WHERE persona_id=?",
     [id_persona]
   );
+  return respuesta;
 }
 
 module.exports = {
