@@ -117,10 +117,11 @@ app.delete("/:id", async function (req, res) {
     
       const persona_data = await service.PersonaGet(persona_id); 
       if (persona_data.length == 1 ) {
-        if (serviceLibro.libroPrestadoPorPersona(persona_id) != null){
+        const libroprestado = await serviceLibro.libroPrestadoPorPersona(persona_id);
+        if ( libroprestado.affectedRows == 1){
           throw new Error("El libro esta prestado no se puede borrar");
         } else {
-          const respuesta = await service.PersonaRemove(persona_id);
+          //const respuesta = await service.PersonaRemove(persona_id);
           if (respuesta.affectedRows == 1) {
             res.status(200).send({ mensaje: "Se borro correctamente la persona" });
           } else {
