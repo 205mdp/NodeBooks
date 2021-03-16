@@ -8,7 +8,7 @@ Alumnos:
 
 Maza Gabriel /
 Camean Fenoy Juan Pablo /
-Paak Jorge German/ Cammarota Federico /
+Paak Jorge German / Cammarota Federico /
 Casquero Ricardo /
 Damiani Juan /
 
