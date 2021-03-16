@@ -5,43 +5,50 @@ const servicePersona = require("../services/servicePersona");
 
 const app = express.Router();
 
-// Inserta un libro en la DB
+/*
+ * POST /api/libro/
+ *
+ * @param {json} {nombre: string, descripcion: string, categoria_id: numerico, personas_id: numerico/null }
+ * @return status: 200, {json} {id: numerico, nombre: string, descripcion: string, categoria_id: numerico, personas_id: numerico/null }
+ * @return status: 413, {json} {mensaje: <descripcion del error>}
+ * @mensajes "ese libro ya existe", "nombre y categoria son datos obligatorios", "no existe la categoria indicada", "no existe la persona indicada", "error inesperado"
+ */
+
 app.post("/", async function (req, res) {
+  
   try {
-    //ecibe: {nombre:string, descripcion:string, categoria_id:numero, persona_id:numero/null}
-    // Verificamos que los campos tengan los datos requeridos
+   
     if (!req.body.nombre || !req.body.descripcion || !req.body.categoria_id) {
-      // TODO sacar descripcion y modificar la DB para que sea nullable.
+     
       throw new Error("Los campos nombre y categoria son obligarios.");
     }
-    // creamos el libro que vamos a insertar y devolver.
+   
     var libro = {
       nombre: req.body.nombre.toUpperCase(),
       descripcion: req.body.descripcion.toUpperCase(),
       categoria_id: req.body.categoria_id,
       persona_id: !req.body.persona_id ? null : req.body.persona_id,
     };
-    // Verificamos si el libro existe, lo podriamos hacer manejando el error de SQL
-    // pero es un curso de web no de sql.
+   
 
     const libroOk = await service.libroFindNombre(libro.nombre);
-    // Si el libro existe da error, si no sigue.
+ 
     if (libroOk[0].idCount > 0) {
       throw new Error("El libro ya existe");
     }
-    // verificamos si la categoria existe.
+    
 
     const cateok = await serviceCategoria.categoriaExisteById(
       libro.categoria_id
     );
-    // Si la categoria no existe da error.
+   
     if (cateok[0].idCount == 0) {
       throw new Error("No existe la categoria indicada");
     }
 
-    // Verificamos si la persona fue enviada.
+   
     if (libro.persona_id != null) {
-      // Verificamos si la persona existe.
+     
 
       const personaOk = await servicePersona.PersonaGet(libro.persona_id);
 
@@ -49,23 +56,31 @@ app.post("/", async function (req, res) {
         throw new Error("No existe la persona indicada.");
       }
     }
-    // Insertamos el libro.
+    
 
     const respuesta = await service.librosAdd(libro);
-    // Verificamos si nos devulve el id insertado.
+
     if (respuesta.insertId > 0) {
       libro.id = respuesta.insertId;
       res.status(200).send(libro);
     } else {
       throw new Error("Error inesperado");
     }
-    //ecibe: {nombre:string, descripcion:string, categoria_id:numero, persona_id:numero/null}
-    //res.status(200).send({ message: error.message }); // {id: numero, nombre:string, descripcion:string, categoria_id:numero, persona_id:numero/null}
+   
   } catch (error) {
-    // "error inesperado", "ese libro ya existe", "nombre y categoria son datos obligatorios", "no existe la categoria indicada", "no existe la persona indicada"
+   
     res.status(413).send({ message: error.message });
   }
 });
+
+/*
+ * GET /api/libro
+ *
+ * @return status: 200, {json} {id: numerico, nombre: string, descripcion: string, categoria_id: numerico, personas_id: numerico/null }
+ * @return status: 413, {json} {mensaje: <descripcion del error>}
+ * @mensajes "error inesperado"
+ * 
+ */
 
 app.get("/", async function (req, res) {
   try {
@@ -74,21 +89,30 @@ app.get("/", async function (req, res) {
     const respuesta = await service.librosList();
     res.status(200).send(respuesta);
 
-    //  [{id: numero, nombre:string, descripcion:string, categoria_id:numero, persona_id:numero/null}]
+    
   } catch (error) {
-    //  "error inesperado"
+  
     res.status(413).send({ message: error.message });
   }
 });
 
+/*
+ * GET /api/libro/:id
+ *
+ * @param {json} {id: numerico}
+ * @return status: 200, {json} {id: numerico, nombre: string, descripcion: string, categoria_id: numerico, personas_id: numerico/null }
+ * @return status: 413, {json} {mensaje: <descripcion del error>}
+ * @mensajes "no se encuentra el libro", "error inesperado"
+ */
+
 app.get("/:id", async function (req, res) {
   try {
     var libro_id = req.params.id;
-    // verificamos que el id sea un numero.
+   
     if (isNaN(libro_id)) {
       throw new Error("Error inesperado el id no es un numero");
     }
-    // consultamos el libro en la db.
+    
 
     const respuesta = await service.librosGet(libro_id);
 
@@ -100,12 +124,21 @@ app.get("/:id", async function (req, res) {
       throw new Error("Error inesperado.");
     }
 
-    // {id: numero, nombre:string, descripcion:string, categoria_id:numero, persona_id:numero/null}
+   
   } catch (error) {
-    // "error inesperado", "no se encuentra ese libro"
+   
     res.status(413).send({ message: error.message });
   }
 });
+
+/*
+ * PUT /api/libro/:id
+ *
+ * @param {json} {id: numerico}
+ * @return status: 200, {json} {id: numerico, nombre: string, descripcion: string, categoria_id: numerico, personas_id: numerico/null }
+ * @return status: 413, {json} {mensaje: <descripcion del error>}
+ * @mensajes "solo se puede modificar la descripcion del libro", "error inesperado"
+ */
 
 app.put("/:id", async function (req, res) {
   try {
@@ -117,7 +150,7 @@ app.put("/:id", async function (req, res) {
       throw new Error("Debe enviar la descripción");
     }
     const descripcion = req.body.descripcion;
-    // Verificamos si manda mas parametros aparte de la descripcion.
+   
     if (Object.keys(req.body).length > 1) {
       throw new Error("Solo se puede modificar la descripcion del libro.");
     }
@@ -139,14 +172,22 @@ app.put("/:id", async function (req, res) {
       throw new Error("Error inesperado.");
     }
 
-    //  {id: numero, nombre:string, descripcion:string, categoria_id:numero, persona_id:numero/null}
-    //  {id: numero, nombre:string, descripcion:string, categoria_id:numero, persona_id:numero/null}
+
   } catch (error) {
-    //  "solo se puede modificar la descripcion del libro
+  
     res.status(413).send({ message: error.message });
   }
 });
 
+/*
+ * PUT /api/libro/prestar/:id
+ *
+ * @param {json} {id: numerico, persona_id: numerico}
+ * @return status: 200, {json} {mensaje: "se presto correctamente" }
+ * @return status: 413, {json} {mensaje: <descripcion del error>}
+ * @mensajes "el libro ya se encuentra prestado, no se puede prestar hasta que no se devuelva", "no se encontro el libro", 
+ * "no se encontrola persona a la que se quiere prestar el libro", "error inesperado"
+ */
 app.put("/prestar/:id", async function (req, res) {
   try {
     const libro_id = req.params.id;
@@ -158,7 +199,7 @@ app.put("/prestar/:id", async function (req, res) {
     }
     const persona_id = req.body.persona_id;
 
-    // ver si el libro esta prestado
+   
     
     const libro_data = await service.librosGet(libro_id);
     
@@ -195,8 +236,7 @@ app.put("/prestar/:id", async function (req, res) {
       }
     }
 
-    // {id:numero, persona_id:numero}
-    //  {mensaje: "se presto correctamente"}
+   
   } catch (error) {
     "error inesperado",
       "el libro ya se encuentra prestado, no se puede prestar hasta que no se devuelva",
@@ -206,6 +246,16 @@ app.put("/prestar/:id", async function (req, res) {
   }
 });
 
+/*
+ * PUT /api/libro/devolver/:id
+ *
+ * @param {json} {id: numerico}
+ * @return status: 200, {json} {mensaje: "se realizo la devolucion correctamente" }
+ * @return status: 413, {json} {mensaje: <descripcion del error>}
+ * @mensajes "ese libro no esta prestado", "ese libro no existe", "error inesperado"
+ */
+
+
 app.put("/devolver/:id", async function (req, res) {
   try {
     const libro_id = req.params.id;
@@ -213,7 +263,7 @@ app.put("/devolver/:id", async function (req, res) {
       throw new Error("Error inesperado el id no es un numero");
     }
 
-    // ver si el libro esta prestado
+    
 
     const libro_data = await service.librosGet(libro_id);
 
@@ -237,10 +287,19 @@ app.put("/devolver/:id", async function (req, res) {
       throw new Error("Error inesperado");
     }
   } catch (error) {
-    // "error inesperado", "ese libro no estaba prestado!", "ese libro no existe"
+   
     res.status(413).send({ message: error.message });
   }
 });
+
+/*
+ * DELETE /api/libro/:id
+ *
+ * @param {json} {id: numerico}
+ * @return status: 200, {json} {mensaje: "se borro correctamente" }
+ * @return status: 413, {json} {mensaje: <descripcion del error>}
+ * @mensajes "nose encuentra ese libro", "ese libro esta prestado no se puede borrar","error inesperado"
+ */
 
 app.delete("/:id", async function (req, res) {
   try {
@@ -264,7 +323,7 @@ app.delete("/:id", async function (req, res) {
     } else {
       throw new Error("No se encontro ese libro.");
     }
-    //  {mensaje: "se borro correctamente"}
+    
   } catch (error) {
     "error inesperado",
       "no se encuentra ese libro",
