@@ -18,7 +18,7 @@ app.post("/", async function (req, res) {
     if (!req.body.nombre || !req.body.categoria_id) {
       throw new Error("Los campos nombre y categoria son obligarios.");
     }
-
+  
     var libro = {
       nombre: req.body.nombre.toUpperCase(),
       descripcion: !req.body.descripcion
@@ -37,21 +37,18 @@ app.post("/", async function (req, res) {
     const cateok = await serviceCategoria.categoriaExisteById(
       libro.categoria_id
     );
-
     if (cateok[0].idCount == 0) {
       throw new Error("No existe la categoria indicada");
     }
 
     if (libro.persona_id != null) {
       const personaOk = await servicePersona.PersonaGet(libro.persona_id);
-
       if (personaOk.length == 0) {
         throw new Error("No existe la persona indicada.");
       }
     }
 
     const respuesta = await service.librosAdd(libro);
-
     if (respuesta.insertId > 0) {
       libro.id = respuesta.insertId;
       res.status(200).send(libro);
@@ -73,8 +70,6 @@ app.post("/", async function (req, res) {
  */
 app.get("/", async function (req, res) {
   try {
-    // buscamos los libros en la db
-
     const respuesta = await service.librosList();
     res.status(200).send(respuesta);
   } catch (error) {
@@ -92,14 +87,13 @@ app.get("/", async function (req, res) {
  */
 app.get("/:id", async function (req, res) {
   try {
-    var libro_id = req.params.id;
 
+    var libro_id = req.params.id;
     if (isNaN(libro_id)) {
       throw new Error("Error inesperado el id no es un numero");
     }
 
     const respuesta = await service.librosGet(libro_id);
-
     if (respuesta.length == 1) {
       res.status(200).send(respuesta[0]);
     } else if (respuesta.length == 0) {

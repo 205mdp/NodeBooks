@@ -15,11 +15,18 @@ async function PersonaList() {
 }
 
 async function PersonaGet(id) {
-  console.log(id);
   const respuesta = await conexion.query("SELECT * FROM persona WHERE id=?", [
     id,
   ]);
-  console.log(respuesta);
+
+  return respuesta;
+}
+
+async function PerosnaByEmail(email) {
+  const respuesta = await conexion.query(
+    "SELECT id FROM persona WHERE email=?",
+    [email]
+  );
   return respuesta;
 }
 
@@ -28,7 +35,6 @@ async function PersonaUpdate(persona) {
     "UPDATE persona SET nombre=?, apellido=?, alias=? WHERE id=?",
     [persona.nombre, persona.apellido, persona.alias, persona.id]
   );
-  console.log(respuesta);
   return respuesta;
 }
 
@@ -45,4 +51,5 @@ module.exports = {
   PersonaGet,
   PersonaUpdate,
   PersonaRemove,
+  PerosnaByEmail,
 };

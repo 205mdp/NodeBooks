@@ -21,7 +21,7 @@ function PersonaRemove(id) {
 }
 
 function PersonaEmailExiste(email) {
-  const datos = model.PerosnaByEmail(email);
+  return model.PerosnaByEmail(email);
 }
 
 module.exports = {
@@ -30,4 +30,5 @@ module.exports = {
   PersonaAdd,
   PersonaUpdate,
   PersonaRemove,
+  PersonaEmailExiste,
 };

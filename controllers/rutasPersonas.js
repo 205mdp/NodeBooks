@@ -29,6 +29,11 @@ app.post("/", async (req, res) => {
       email: req.body.email.toUpperCase(),
     };
 
+    const emailExiste = await service.PersonaEmailExiste(persona.email);
+    if (emailExiste.length > 0) {
+      throw new Error("El email ya se encuentra registrado");
+    }
+
     const respuesta = await service.PersonaAdd(persona);
 
     if (respuesta.insertId > 0) {
@@ -73,7 +78,6 @@ app.get("/:id", async (req, res) => {
     if (isNaN(persona_id)) {
       throw new Error("Error inesperado el id no es un numero");
     }
-    console.log("aca llegue " + persona_id);
     const respuesta = await service.PersonaGet(persona_id);
 
     if (respuesta.length == 1) {
@@ -98,38 +102,40 @@ app.get("/:id", async (req, res) => {
  */
 app.put("/:id", async (req, res) => {
   try {
+    var persona_id = req.params.id;
+    if (isNaN(persona_id)) {
+      throw new Error("Error inesperado el id no es un numero");
+    }
+
     if (!req.body.nombre || !req.body.apellido || !req.body.alias) {
       throw new Error("Faltan datos.");
     }
     if (req.body.email) {
       throw new Error("El email no se puede modificar.");
     }
-    var persona_id = req.params.id;
+
     const persona = {
       nombre: req.body.nombre.toUpperCase(),
       apellido: req.body.apellido.toUpperCase(),
       alias: req.body.alias.toUpperCase(),
       id: persona_id,
     };
-    // TODO verificar si la persona existe.
 
-    // TODO
-    if (isNaN(persona_id)) {
-      throw new Error("Error inesperado el id no es un numero");
+    const personaExiste = await service.PersonaGet(persona.id);
+
+    if (personaExiste.length == 0) {
+      throw new Error("No se encuentra esa persona");
     }
+
     const respuesta = await service.PersonaUpdate(persona);
-    console.log(respuesta);
-    //recibe: {nombre: string, apellido: string, alias: string, email: string} el email no se puede modificar.
+
     if (respuesta.affectedRows == 1) {
       var persona_updated = await service.PersonaGet(persona.id);
-
       res.status(200).send(persona_updated[0]);
     } else {
       throw new Error("Error inesperado");
     }
-    //y el objeto modificado o
   } catch (error) {
-    //"error inesperado", "no se encuentra esa persona"
     res.status(413).send({ message: error.message });
   }
 });
@@ -156,7 +162,9 @@ app.delete("/:id", async function (req, res) {
         persona_id
       );
       if (libroPrestad.length != 0) {
-        throw new Error("El libro esta prestado no se puede borrar");
+        throw new Error(
+          "Esa persona tiene libros asociados, no se puede eliminar"
+        );
       } else {
         const respuesta = await service.PersonaRemove(persona_id);
         if (respuesta.affectedRows == 1) {
@@ -168,9 +176,8 @@ app.delete("/:id", async function (req, res) {
         }
       }
     } else {
-      throw new Error("No se encontro la persona.");
+      throw new Error("No existe esa persona.");
     }
-    //  {mensaje: "se borro correctamente"}
   } catch (error) {
     res.status(413).send({ message: error.message });
   }

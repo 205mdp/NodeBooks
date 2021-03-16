@@ -3,6 +3,12 @@ var util = require("util");
 // test
 var db;
 
+/*
+ * Conceccion con la base de datos. 
+ *
+ * @return conector de db.
+ * @mensajes consola "Ya estas conectado a la base de datos!", "Error conectando con la base de datos!"
+ */
 function connectDatabase() {
   if (!db) {
     // test
