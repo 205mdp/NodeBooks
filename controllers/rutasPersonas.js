@@ -30,18 +30,14 @@ app.post("/", async (req, res) => {
     };
 
     const respuesta = await service.PersonaAdd(persona);
-    console.log(respuesta);
+
     if (respuesta.insertId > 0) {
       persona.id = respuesta.insertId;
-      console.log(persona);
-      res.status(200).send({ persona: persona }); //    {mensaje: "se borro correctamente"}
+      res.status(200).send({ persona: persona });
     } else {
       throw new Error("No se pudo insertar");
     }
-    console.log(persona);
-    //res.status(200).send({ persona });
   } catch (error) {
-    // ser: "faltan datos", "el email ya se encuentra registrado", "error inesperado"
     res.status(413).send({ message: error.message });
   }
 });

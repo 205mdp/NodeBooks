@@ -22,7 +22,7 @@ function categoriasRemove(id) {
 
 function categoriaExiste(nombre) {
   const categoria = model.categoriaByNombre(nombre);
-  return categoria.length > 0 ? true : false;
+  return categoria;
 }
 
 function categoriaExisteById(id) {

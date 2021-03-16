@@ -22,7 +22,8 @@ app.post("/", async (req, res) => {
     };
     // Tambien lo verifica con el duplicate de la DB.
     const categoriaExiste = await service.categoriaExiste(categoria.nombre);
-    if (categoriaExiste) {
+
+    if (categoriaExiste.length > 0) {
       throw new Error("ese nombre de categoria ya existe");
     }
     const respuesta = await service.categoriasAdd(categoria);
@@ -98,7 +99,6 @@ app.get("/:id", async (req, res) => {
  */
 app.delete("/:id", async (req, res) => {
   try {
-    // console.log("Catagoria por id" + req.params.id);
     var categoria_id = req.params.id;
     if (isNaN(categoria_id)) {
       throw new Error("Error inesperado el id no es un numero");

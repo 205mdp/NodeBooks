@@ -40,7 +40,7 @@ async function categoriaByNombre(nombre) {
 }
 
 async function categoriaById(id) {
-  await conexion.query(
+  const respuesta = await conexion.query(
     "SELECT COUNT(id) as idCount FROM categoria WHERE id=?",
     [id]
   );

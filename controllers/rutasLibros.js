@@ -15,13 +15,15 @@ const app = express.Router();
  */
 app.post("/", async function (req, res) {
   try {
-    if (!req.body.nombre || !req.body.descripcion || !req.body.categoria_id) {
+    if (!req.body.nombre || !req.body.categoria_id) {
       throw new Error("Los campos nombre y categoria son obligarios.");
     }
 
     var libro = {
       nombre: req.body.nombre.toUpperCase(),
-      descripcion: req.body.descripcion.toUpperCase(),
+      descripcion: !req.body.descripcion
+        ? null
+        : req.body.descripcion.toUpperCase(),
       categoria_id: req.body.categoria_id,
       persona_id: !req.body.persona_id ? null : req.body.persona_id,
     };
@@ -64,7 +66,7 @@ app.post("/", async function (req, res) {
 /*
  * GET /api/libro
  *
- * @return status: 200, {json} {id: numerico, nombre: string, descripcion: string, categoria_id: numerico, personas_id: numerico/null }
+ * @return status: 200, {json} [{id: numerico, nombre: string, descripcion: string, categoria_id: numerico, personas_id: numerico/null }]
  * @return status: 413, {json} {mensaje: <descripcion del error>}
  * @mensajes "error inesperado"
  *
@@ -129,9 +131,9 @@ app.put("/:id", async function (req, res) {
     }
     const descripcion = req.body.descripcion;
 
-    if (Object.keys(req.body).length > 1) {
-      throw new Error("Solo se puede modificar la descripcion del libro.");
-    }
+    //if (Object.keys(req.body).length > 1) {
+    //  throw new Error("Solo se puede modificar la descripcion del libro.");
+    //}
 
     const libro = {
       id: libro_id,
@@ -193,14 +195,11 @@ app.put("/prestar/:id", async function (req, res) {
         "no se encontro la persona a la que se quiere prestar el libro"
       );
     } else {
-      console.log("por update");
-
       var libro = {
         persona_id: persona_id,
         id: libro_id,
       };
       const respuesta = await service.librosPrestar(libro);
-      console.log(respuesta);
 
       if (respuesta.affectedRows == 1) {
         res.status(200).send({ mensaje: "se presto correctamente" });
@@ -209,10 +208,6 @@ app.put("/prestar/:id", async function (req, res) {
       }
     }
   } catch (error) {
-    "error inesperado",
-      "el libro ya se encuentra prestado, no se puede prestar hasta que no se devuelva",
-      "no se encontro el libro",
-      "no se encontro la persona a la que se quiere prestar el libro";
     res.status(413).send({ message: error.message });
   }
 });
@@ -247,7 +242,7 @@ app.put("/devolver/:id", async function (req, res) {
       id: libro_id,
     };
     const respuesta = await service.librosPrestar(libro);
-    console.log(respuesta);
+    
     if (respuesta.affectedRows == 1) {
       res.status(200).send({ mensaje: "se devolvio correctamente" });
     } else {
@@ -289,9 +284,6 @@ app.delete("/:id", async function (req, res) {
       throw new Error("No se encontro ese libro.");
     }
   } catch (error) {
-    "error inesperado",
-      "no se encuentra ese libro",
-      "ese libro esta prestado no se puede borrar";
     res.status(413).send({ message: error.message });
   }
 });
