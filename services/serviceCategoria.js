@@ -22,11 +22,7 @@ function categoriasRemove(id) {
 
 function categoriaExiste(nombre) {
   const categoria = model.categoriaByNombre(nombre);
-  if (categoria.length > 0) {
-    return true;
-  } else {
-    return false;
-  }
+  return categoria.length > 0 ? true : false;
 }
 
 function categoriaExisteById(id) {
